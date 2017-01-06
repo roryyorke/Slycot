@@ -21,15 +21,13 @@ def configuration(parent_package='', top_path=None):
 
     f2py_sources = ['src/_wrapper.pyf']
 
-    if sys.platform == 'win32':
-        liblist = ['liblapack', 'libblas']
-    else:
-        liblist = ['lapack']
+    from numpy.distutils.system_info import get_info
+    opts = get_info('lapack_opt')
 
     config.add_extension(
         name='_wrapper',
-        libraries=liblist,
-        sources=fortran_sources + f2py_sources)
+        sources=fortran_sources + f2py_sources,
+        **opts)
 
     config.make_config_py()  # installs __config__.py
 
