@@ -3,9 +3,9 @@ language: python
 
 python:
   - "2.7"
-  - "3.3"
   - "3.4"
   - "3.5"
+  - "3.6"
 
 before_install:
   - sudo apt-get install gfortran
@@ -20,7 +20,6 @@ before_install:
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
   - conda install conda-build
-  - conda config --add channels http://conda.binstar.org/python-control
   - conda info -a
   - conda create -q -n test-environment python="$TRAVIS_PYTHON_VERSION" pip coverage nose
   - source activate test-environment
