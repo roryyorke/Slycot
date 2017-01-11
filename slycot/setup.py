@@ -23,6 +23,10 @@ def configuration(parent_package='', top_path=None):
 
     from numpy.distutils.system_info import get_info
     opts = get_info('lapack_opt')
+    if not opts:
+        opts = get_info('lapack')
+    if not opts:
+        raise RuntimeError("Couldn't find LAPACK library to link against")
 
     config.add_extension(
         name='_wrapper',
