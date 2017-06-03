@@ -11,28 +11,28 @@ matrix:
 before_install:
   - sudo apt-get install gfortran
   - if [[ "$SLICOT_BUILD" == "conda" ]]; then
-       ./travis/conda-before_install.sh
+       ./travis/conda-before_install.sh;
     else
-       ./travis/plain-before_install.sh
+       ./travis/plain-before_install.sh;
     fi
 
 install:
   - if [[ "$SLICOT_BUILD" == "conda" ]]; then
-       ./travis/conda-install.sh
+       ./travis/conda-install.sh;
     else
-       ./travis/plain-install.sh
+       ./travis/plain-install.sh;
     fi
 
 script:
   - if [[ "$SLICOT_BUILD" == "conda" ]]; then
-       ./travis/conda-script.sh
+       ./travis/conda-script.sh;
     else
-       ./travis/plain-script.sh
+       ./travis/plain-script.sh;
     fi
 
 after_success:
   - if [[ "$SLICOT_BUILD" == "conda" ]]; then
-       ./travis/conda-after_success.sh
+       ./travis/conda-after_success.sh;
     else
-       ./travis/plain-after_success.sh
+       ./travis/plain-after_success.sh;
     fi
