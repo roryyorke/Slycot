@@ -1,39 +1,49 @@
 # cargo-culted from python-control's .travis.yml
 language: python
 
-python:
-  - "2.7"
-  - "3.3"
-  - "3.4"
-  - "3.5"
+matrix:
+  include:
+    - python: "2.7"
+      env: SLICOT_BUILD=conda
+    - python: "2.7"
+      env: SLICOT_BUILD=plain
+
+    - python: "3.3"
+      env: SLICOT_BUILD=conda
+
+    - python: "3.4"
+      env: SLICOT_BUILD=conda
+
+    - python: "3.5"
+      env: SLICOT_BUILD=conda
+    - python: "3.5"
+      env: SLICOT_BUILD=plain
 
 before_install:
-  - sudo apt-get install gfortran
-  - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
-      wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh;
+  - sudo apt-get -qq install gfortran
+  - if [[ "$SLICOT_BUILD" == "conda" ]]; then
+       ./travis/conda-before_install.sh;
     else
-      wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+       ./travis/plain-before_install.sh;
     fi
-  - bash miniconda.sh -b -p $HOME/miniconda
-  - export PATH="$HOME/miniconda/bin:$PATH"
-  - hash -r
-  - conda config --set always_yes yes --set changeps1 no
-  - conda update -q conda
-  - conda install conda-build
-  - conda config --add channels http://conda.binstar.org/python-control
-  - conda info -a
-  - conda create -q -n test-environment python="$TRAVIS_PYTHON_VERSION" pip coverage nose
-  - source activate test-environment
-  # coveralls not in conda repos :-(
-  - pip install coveralls
 
 install:
-  - conda build --python "$TRAVIS_PYTHON_VERSION" conda-recipe
-  - conda install slycot --use-local
+  - if [[ "$SLICOT_BUILD" == "conda" ]]; then
+       ./travis/conda-install.sh;
+    else
+       ./travis/plain-install.sh;
+    fi
 
-# TODO: replace with nose?
 script:
-  - python runtests.py --coverage
+  - if [[ "$SLICOT_BUILD" == "conda" ]]; then
+       ./travis/conda-script.sh;
+    else
+       ./travis/plain-script.sh;
+    fi
 
 after_success:
-  - coveralls
+  - if [[ "$SLICOT_BUILD" == "conda" ]]; then
+       ./travis/conda-after_success.sh;
+    else
+       ./travis/plain-after_success.sh;
+    fi
