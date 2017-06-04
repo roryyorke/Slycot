@@ -12,6 +12,8 @@ conda install conda-build
 conda info -a
 conda create -q -n test-environment python="$TRAVIS_PYTHON_VERSION" pip coverage nose
 
+set +v
 source activate test-environment
+set -v
 
 pip install coveralls
