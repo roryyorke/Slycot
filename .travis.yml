@@ -3,9 +3,12 @@ language: python
 
 matrix:
   include:
-    - python: "3.5"
-      env: SLICOT_BUILD=conda
-    - python: "3.5"
+    # - python: "3.5"
+    #   env: SLICOT_BUILD=conda
+    # - python: "3.5"
+    #   env: SLICOT_BUILD=plain
+    - os: osx
+      python: "3.5"
       env: SLICOT_BUILD=plain
 
 before_install:
