@@ -8,11 +8,12 @@ matrix:
     # - python: "3.5"
     #   env: SLICOT_BUILD=plain
     - os: osx
-      python: "3.5"
       env: SLICOT_BUILD=plain
 
 before_install:
-  - sudo apt-get install gfortran
+  - if [[ "TRAVIS_OS_NAME" == "linux" ]]; then
+       sudo apt-get -qq install gfortran
+    fi
   - if [[ "$SLICOT_BUILD" == "conda" ]]; then
        ./travis/conda-before_install.sh;
     else
