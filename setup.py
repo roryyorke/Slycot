@@ -203,31 +203,13 @@ def setup_package():
         classifiers=[_f for _f in CLASSIFIERS.split('\n') if _f],
         platforms=["Windows", "Linux", "Solaris", "Mac OS-X", "Unix"],
         cmdclass={"sdist": sdist_checked},
+        configuration=configuration,
+        version = get_version_info()[0]
     )
 
     # Run build
-    if len(sys.argv) >= 2 and \
-            ('--help' in sys.argv[1:] or
-             sys.argv[1] in ('--help-commands', 'egg_info', '--version',
-             'clean')):
-        # Use setuptools for these commands (they don't work well or at all
-        # with distutils).  For normal builds use distutils.
-        try:
-            from setuptools import setup
-        except ImportError:
-            from distutils.core import setup
-
-        FULLVERSION, GIT_REVISION = get_version_info()
-        metadata['version'] = FULLVERSION
-    elif len(sys.argv) >= 2 and sys.argv[1] == 'bdist_wheel':
-        # bdist_wheel needs setuptools
-        import setuptools
-        setuptools  # reference once for pyflakes
-        from numpy.distutils.core import setup
-        metadata['configuration'] = configuration
-    else:
-        from numpy.distutils.core import setup
-        metadata['configuration'] = configuration
+    import setuptools
+    from numpy.distutils.core import setup
 
     try:
         setup(**metadata)
