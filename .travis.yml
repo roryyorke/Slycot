@@ -35,15 +35,11 @@ install:
     fi
 
 script:
-  - if [[ "$SLICOT_BUILD" == "conda" ]]; then
-       true; # no post-install actions
-    else
+  - if [[ "$SLICOT_BUILD" == "plain" ]]; then
        ./travis/plain-script.sh;
     fi
 
 after_success:
-  - if [[ "$SLICOT_BUILD" == "conda" ]]; then
-       true; # not sure how to integrate coveralls into conda-build
-    else
+  - if [[ "$SLICOT_BUILD" == "plain" ]]; then
        ./travis/plain-after_success.sh;
     fi
