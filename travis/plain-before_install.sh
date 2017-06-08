@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -ev
 
-sudo apt-get -qq install liblapack-dev;
+sudo apt-get install -qq liblapack-dev;
 
 # To get wheels when using Ubuntu 14.04, this is necessary; perhaps not otherwise
 pip install -qqq --upgrade pip

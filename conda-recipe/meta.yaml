@@ -2,6 +2,10 @@ package:
   name: slycot
   version: "0.3.2"
 
+# to get test.source_files below to work
+source:
+  path: ..
+
 build:
   number: 1
 
@@ -14,6 +18,7 @@ requirements:
     - python
     - numpy
     - lapack
+    - nose # to force same version of numpy as in test :(
 
   run:
     - python
@@ -21,8 +26,14 @@ requirements:
     - lapack
 
 test:
-  imports:
-    - slycot
+  requires:
+    - nose # numpy testing requires nose
+  source_files:
+    - slycot/tests
+  commands:
+    - python -c "from slycot import tb05ad"
+    - python -c "from slycot._wrapper import tb05ad_ng"
+    - (cd slycot/tests && python -m unittest discover)
 
 about:
   home: https://github.com/python-control/Slycot

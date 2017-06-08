@@ -8,5 +8,5 @@ set +v
 source activate test-environment
 set -v
 
+# this will also run the unit tests; see ../conda-recipe/meta.yaml
 conda build --python "$TRAVIS_PYTHON_VERSION" conda-recipe
-conda install -q slycot --use-local

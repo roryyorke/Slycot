@@ -20,7 +20,7 @@ matrix:
       env: SLICOT_BUILD=plain
 
 before_install:
-  - sudo apt-get -qq install gfortran
+  - sudo apt-get install -qq gfortran
   - if [[ "$SLICOT_BUILD" == "conda" ]]; then
        ./travis/conda-before_install.sh;
     else
@@ -36,14 +36,14 @@ install:
 
 script:
   - if [[ "$SLICOT_BUILD" == "conda" ]]; then
-       ./travis/conda-script.sh;
+       ;
     else
        ./travis/plain-script.sh;
     fi
 
 after_success:
   - if [[ "$SLICOT_BUILD" == "conda" ]]; then
-       ./travis/conda-after_success.sh;
+       ;
     else
        ./travis/plain-after_success.sh;
     fi
