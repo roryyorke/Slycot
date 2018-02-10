@@ -10,3 +10,5 @@ build.log
 *.egg-info/
 .coverage
 *~
+/slycot/src/_wrapper-f2pywrappers.f
+/slycot/src/_wrappermodule.c
