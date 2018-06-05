@@ -9,7 +9,6 @@ requirements:
   build:
     - python
     - numpy
-    - lapack
     - m2w64-gcc-fortran # [win]
     - gfortran_linux-64	# [linux]
     - gfortran_osx-64	# [osx]
@@ -17,7 +16,6 @@ requirements:
   run:
     - python
     - numpy
-    - lapack
     - libgfortran
 
 test:
