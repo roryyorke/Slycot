@@ -13,17 +13,14 @@ build:
 
 requirements:
   build:
-    - toolchain
     - python
-    - blas 1.1 {{ variant }}
-    - openblas 0.2.20|0.2.20.*
-    - numpy 1.8.*
+    - openblas
+    - numpy
   run:
     - python
-    - blas 1.1 {{ variant }}
     - libgfortran
-    - openblas 0.2.20|0.2.20.*
-    - numpy >=1.8
+    - openblas
+    - numpy
 
 test:
   imports:
@@ -34,7 +31,6 @@ about:
   dev_url: https://github.com/python-control/Slycot
   license: GPL-2.0
   license_family: GPL
-  license_file: COPYING
   summary: 'Slycot: a wrapper for the SLICOT control and systems library'
   description: |
     Slycot wraps the SLICOT library which is used for control and systems
