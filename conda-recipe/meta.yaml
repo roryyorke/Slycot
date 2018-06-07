@@ -8,8 +8,6 @@ package:
 
 build:
   number: 1
-  features:
-    - blas_{{ variant }}
 
 requirements:
   build:
