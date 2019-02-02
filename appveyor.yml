@@ -9,5 +9,12 @@ install:
   - conda install -q conda-verify
   - conda info -a
 
+environment:
+  matrix:
+    - SLYCOT_PYTHON_VERSION: 2.7
+    - SLYCOT_PYTHON_VERSION: 3.5
+    - SLYCOT_PYTHON_VERSION: 3.6
+    - SLYCOT_PYTHON_VERSION: 3.7
+
 build_script: 
-  - conda build -c conda-forge conda-recipe-openblas
+  - conda build --python %SLYCOT_PYTHON_VERSION% -c conda-forge conda-recipe-openblas
