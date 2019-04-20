@@ -11,9 +11,6 @@ build:
 
 requirements:
   build:
-    - python {{ PY_VER }}
-    - numpy
-    - openblas >=0.3.0
     - {{ compiler('c') }}       # [not osx]
     - gcc                       # [osx]
     - {{ compiler('fortran') }} # [linux]
@@ -22,7 +19,7 @@ requirements:
   host:
     - python {{ PY_VER }}
     - flang                     # [win]
-    - numpy
+    - numpy x.x
     - openblas >=0.3.0
     - libgfortran-ng # [not-win]
     - libgcc-ng      # [linux]
@@ -33,11 +30,7 @@ requirements:
    
   run:
     - python {{ PY_VER }}
-    - {{ pin_compatible('numpy') }}
-    - openblas >=0.3.0
-    - libgfortran-ng # [not win]
-    - libgcc-ng      # [linux]
-    - libflang       # [win]
+    - numpy x.x
 
 test:
   requires:
