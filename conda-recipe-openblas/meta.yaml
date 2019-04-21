@@ -11,10 +11,12 @@ build:
 
 requirements:
   build:
-    - {{ compiler('c') }}
-    - {{ compiler('fortran') }}
+    - {{ compiler('c') }}       # [not osx]
+    - {{ compiler('fortran') }} # [not win]
 
   host:
+    - gcc                       # [osx]
+    - flang                     # [win]
     - python
     - scikit-build >=0.8.0
     - numpy
