@@ -11,37 +11,24 @@ build:
 
 requirements:
   build:
-    - python {{ PY_VER }}
-    - numpy
-    - openblas >=0.3.0
-    - {{ compiler('c') }}       # [not osx]
-    - gcc                       # [osx]
-    - {{ compiler('fortran') }} # [linux]
-    - scikit-build >=0.8.0
+    - {{ compiler('c') }}
+    - {{ compiler('fortran') }}
 
   host:
-    - python {{ PY_VER }}
-    - flang                     # [win]
-    - numpy x.x
-    - openblas >=0.3.0
-    - libgfortran-ng # [not-win]
-    - libgcc-ng      # [linux]
+    - python
     - scikit-build >=0.8.0
+    - numpy
+    - openblas >=0.3.0
    # on Windows, this relies on having visual studio CE 2015
    # this link needed quite some searching, please do not delete!
    # https://go.microsoft.com/fwlink/?LinkId=532606&clcid=0x409
-   
   run:
-    - python {{ PY_VER }}
-    - numpy x.x
+    - python
+    - numpy
     - openblas >=0.3.0
-    - libgfortran-ng # [not win]
-    - libgcc-ng      # [linux]
-    - libflang       # [win]
 
+   
 test:
-  requires:
-    - python {{PY_VER}}
   imports:
     - slycot
 
