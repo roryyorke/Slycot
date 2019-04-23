@@ -71,12 +71,12 @@ def git_version(srcdir=None):
     try:
         GIT_VERSION = VERSION
         GIT_REVISION = 'Unknown'
-        CIT_CYCLE = 0
+        GIT_CYCLE = 0
         out = _minimal_ext_cmd(['git', 'rev-parse', 'HEAD'], srcdir)
         GIT_REVISION = out.strip().decode('ascii')
         out = _minimal_ext_cmd(['git', 'tag'], srcdir)
         GIT_VERSION = out.strip().decode('ascii').split('\n')[-1][1:]
-        out = _minimal_ext_cmd(['git', 'describe', '--tags'], srcdir)
+        out = _minimal_ext_cmd(['git', 'describe', '--tags', '--long'], srcdir)
         GIT_CYCLE = out.strip().decode('ascii').split('-')[1]
     except OSError:
         pass
