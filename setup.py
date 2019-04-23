@@ -46,7 +46,7 @@ Operating System :: MacOS
 ISRELEASED = False
 # assume a version set by conda, next update with git,
 # otherwise count on default
-VERSION = '0.3.3'
+VERSION = '0.3.4'
 
 # Return the git revision as a string
 def git_version(srcdir=None):
