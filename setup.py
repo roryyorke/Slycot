@@ -46,7 +46,7 @@ Operating System :: MacOS
 """
 
 # defaults
-ISRELEASED = False
+ISRELEASED = True
 # assume a version set by conda, next update with git,
 # otherwise count on default
 VERSION = 'Unkown'
@@ -136,8 +136,19 @@ def get_version_info(srcdir=None):
         GIT_REVISION = setupcfg['metadata'].get('gitrevision', '')
         return FULLVERSION, GIT_REVISION
     else:
-        FULLVERSION = VERSION
-        GIT_REVISION = "Unknown"
+
+        # try to find a version number from the dir name
+        dname = os.getcwd().split(os.sep)[-1]
+        import re
+
+        m = re.search(r'^[!-].-([0-9.]*).*$', dname)
+        if m:
+            FULLVERSION = m.group()
+            GIT_REVISION = ''
+      
+        else:
+            FULLVERSION = VERSION
+            GIT_REVISION = "Unknown"
 
     if not ISRELEASED:
         FULLVERSION += '.' + str(GIT_CYCLE)
