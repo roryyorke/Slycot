@@ -12,7 +12,7 @@ DOCLINES = __doc__.split("\n")
 import os
 import sys
 import subprocess
-
+import configparser
 
 if sys.version_info[:2] < (2, 6) or (3, 0) <= sys.version_info[0:2] < (3, 2):
     raise RuntimeError("Python version 2.6, 2.7 or >= 3.2 required.")
@@ -46,9 +46,13 @@ Operating System :: MacOS
 ISRELEASED = False
 # assume a version set by conda, next update with git,
 # otherwise count on default
-VERSION = '0.3.4'
+VERSION = 'Unkown'
 
-# Return the git revision as a string
+# Return the git version, revision and cycle
+#
+# Uses rev-parse to get the revision
+#      tag to get the version number from the latest tag
+#      and detects (approximate) revision cycles
 def git_version(srcdir=None):
     def _minimal_ext_cmd(cmd, srcdir):
         # construct minimal environment
@@ -94,6 +98,15 @@ if os.path.exists('MANIFEST'):
 # a lot more robust than what was previously being used.
 builtins.__SLYCOT_SETUP__ = True
 
+def rewrite_setup_cfg(version, gitrevision, release):
+    toreplace = dict(locals())
+    data = ''.join(open('setup.cfg.in', 'r').readlines()).split('@')
+    for k, v in toreplace.items():
+        idx = data.index(k)
+        data[idx] = v
+    cfg = open('setup.cfg', 'w')
+    cfg.write(''.join(data))
+    cfg.close()
 
 def get_version_info(srcdir=None):
     global ISRELEASED
@@ -104,19 +117,21 @@ def get_version_info(srcdir=None):
     # the build under Python 3.
     if os.environ.get('CONDA_BUILD', False):
         FULLVERSION = os.environ.get('PKG_VERSION', '???')
-        GIT_REVISION = ''
+        GIT_REVISION = os.environ.get('GIT_DESCRIBE_HASH', '')
         ISRELEASED = True
+        rewrite_setup_cfg(FULLVERSION, GIT_REVISION, 'yes') 
     elif os.path.exists('.git'):
         FULLVERSION, GIT_REVISION, GIT_CYCLE = git_version(srcdir)
         ISRELEASED = (GIT_CYCLE == 0)
-    elif os.path.exists('slycot/version.py'):
-        # must be a source distribution, use existing version file
-        try:
-            from slycot.version import git_revision as GIT_REVISION
-        except ImportError:
-            raise ImportError("Unable to import git_revision. Try removing "
-                              "slycot/version.py and the build directory "
-                              "before building.")
+        rewrite_setup_cfg(FULLVERSION, GIT_REVISION,
+                          (ISRELEASED and 'yes') or 'no')
+    elif os.path.exists('setup.cfg'):
+        # valid distribution
+        setupcfg = configparser.ConfigParser()
+        setupcfg.read('setup.cfg')
+        FULLVERSION = setupcfg['metadata'].get('version', 'Unknown')
+        GIT_REVISION = setupcfg['metadata'].get('gitrevision', '')
+        return FULLVERSION, GIT_REVISION
     else:
         FULLVERSION = VERSION
         GIT_REVISION = "Unknown"
@@ -125,18 +140,6 @@ def get_version_info(srcdir=None):
         FULLVERSION += '.' + str(GIT_CYCLE)
 
     return FULLVERSION, GIT_REVISION
-
-def configuration(parent_package='', top_path=None):
-    from numpy.distutils.misc_util import Configuration
-    config = Configuration(None, parent_package, top_path)
-    config.set_options(ignore_setup_xxx_py=True,
-                       assume_default_configuration=True,
-                       delegate_options_to_subpackages=True,
-                       quiet=True)
-    config.add_subpackage('slycot')
-    config.get_version('slycot/version.py')  # sets config.version
-    return config
-
 
 def check_submodules():
     """ verify that the submodules are checked out and clean
@@ -188,7 +191,7 @@ def setup_package():
         long_description="\n".join(DOCLINES[2:]),
         url='https://github.com/python-control/Slycot',
         author='Enrico Avventi et al.',
-        license='GPLv2',
+        license='GPL-2.0',
         classifiers=[_f for _f in CLASSIFIERS.split('\n') if _f],
         platforms=["Windows", "Linux", "Solaris", "Mac OS-X", "Unix"],
         cmdclass={"sdist": sdist_checked},
