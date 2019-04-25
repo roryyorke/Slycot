@@ -97,6 +97,7 @@ builtins.__SLYCOT_SETUP__ = True
 
 def get_version_info(srcdir=None):
     global ISRELEASED
+    GIT_CYCLE = 0
     
     # Adding the git rev number needs to be done inside write_version_py(),
     # otherwise the import of slycot.version messes up
@@ -104,10 +105,10 @@ def get_version_info(srcdir=None):
     if os.environ.get('CONDA_BUILD', False):
         FULLVERSION = os.environ.get('PKG_VERSION', '???')
         GIT_REVISION = ''
-        GIT_CYCLE = 0
         ISRELEASED = True
     elif os.path.exists('.git'):
-        FULLVERSION, GIT_REVISION, GIT_CYCLE = git_version(srcdir)        
+        FULLVERSION, GIT_REVISION, GIT_CYCLE = git_version(srcdir)
+        ISRELEASED = (GIT_CYCLE == 0)
     elif os.path.exists('slycot/version.py'):
         # must be a source distribution, use existing version file
         try:
@@ -158,8 +159,7 @@ def check_submodules():
         if line.startswith('-') or line.startswith('+'):
             raise ValueError('Submodule not clean: %s' % line)
 
-from distutils.command.sdist import sdist
-
+from skbuild.command.sdist import sdist
 
 class sdist_checked(sdist):
     """ check submodules on sdist to prevent incomplete tarballs """
