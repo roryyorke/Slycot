@@ -141,7 +141,7 @@ def get_version_info(srcdir=None):
         dname = os.getcwd().split(os.sep)[-1]
         import re
 
-        m = re.search(r'^[!-].-([0-9.]*).*$', dname)
+        m = re.search(r'[0-9.]+', dname)
         if m:
             FULLVERSION = m.group()
             GIT_REVISION = ''
