@@ -124,17 +124,19 @@ add_custom_command(
   ${CMAKE_CURRENT_SOURCE_DIR}/${F2PYSOURCE}
   )
 
+
+# when doing "pip install slycot-<vers>.tar.gz", the location of
+# fortranobject.[ch] is not predictable, or at least not the same as
+# when numpy is "normally" installed, so engage in this hackery to
+# find it:
 execute_process(
   COMMAND ${PYTHON_EXECUTABLE} -c "from __future__ import print_function; import numpy; print(numpy.__file__)"
   RESULT_VARIABLE SLYCOT_NUMPY_RESULT
   OUTPUT_VARIABLE SLYCOT_NUMPY_INITFILE)
-message(STATUS "SLYCOT_NUMPY_RESULT: ${SLYCOT_NUMPY_RESULT}")
-message(STATUS "SLYCOT_NUMPY_INITFILE: ${SLYCOT_NUMPY_INITFILE}")
+
 get_filename_component(SLYCOT_NUMPY_ROOT ${SLYCOT_NUMPY_INITFILE} DIRECTORY)
 set(SLYCOT_F2PY_SRC "${SLYCOT_NUMPY_ROOT}/f2py/src")
 set(SLYCOT_F2PY_FORTRANOBJECT "${SLYCOT_F2PY_SRC}/fortranobject.c")
-
-message(STATUS "SLYCOT_F2PY_FORTRANOBJECT: ${SLYCOT_F2PY_FORTRANOBJECT}")
 
 add_library(
   ${SLYCOT_MODULE} SHARED
