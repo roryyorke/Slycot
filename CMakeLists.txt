@@ -8,6 +8,8 @@ endif()
 
 project(slycot VERSION ${SLYCOT_VERSION} LANGUAGES NONE)
 
+find_package(PythonExtensions REQUIRED)
+
 # Fortran detection fails on windows, use the CMAKE_C_SIMULATE flag to
 # force success
 if(WIN32)

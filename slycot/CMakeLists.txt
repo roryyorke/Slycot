@@ -166,7 +166,7 @@ target_include_directories(
   ${PYTHON_INCLUDE_DIRS}
   )
 
-install(TARGETS ${SLYCOT_MODULE} DESTINATION slycot)
-install(FILES ${PYSOURCE} DESTINATION slycot)
+install(TARGETS ${SLYCOT_MODULE} DESTINATION ${PYTHON_RELATIVE_SITE_PACKAGES_DIR}/slycot)
+install(FILES ${PYSOURCE} DESTINATION ${PYTHON_RELATIVE_SITE_PACKAGES_DIR}/slycot)
 
 add_subdirectory(tests)
