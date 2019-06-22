@@ -13,7 +13,12 @@ build_script:
   - conda build -c conda-forge conda-recipe-openblas
 
 test_script:
+  - conda create -n test-environment
+  - conda activate test-environment
+
   - conda install -c conda-forge local::slycot
+  - conda install nose # for tests
+
   - cd ..
   - python Slycot/runtests.py --coverage --no-build
 
