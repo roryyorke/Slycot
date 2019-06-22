@@ -14,7 +14,7 @@ build_script:
 
 test_script:
   - conda create -n test-environment
-  - conda activate test-environment
+  - activate test-environment
 
   - conda install -c conda-forge local::slycot
   - conda install nose # for tests
