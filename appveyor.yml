@@ -11,3 +11,12 @@ install:
 
 build_script: 
   - conda build -c conda-forge conda-recipe-openblas
+
+test_script:
+  - cd ..
+  - python Slycot/runtests.py --coverage --no-build
+
+  # test with python-control
+  - conda install -c conda-forge scipy matplotlib
+  - git clone --depth 1 https://github.com/python-control/python-control.git control
+  - cd control; python setup.py test
