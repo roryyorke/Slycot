@@ -19,7 +19,9 @@ build_script:
   - conda build -c conda-forge --python %SLYCOT_PYTHON_VERSION% conda-recipe-openblas
 
 test_script:
-  - conda create -n test-environment -c conda-forge local::slycot nose
+  # force qt version 4 for now; see https://github.com/ContinuumIO/anaconda-issues/issues/1068
+  # not quite sure this is the same issue
+  - conda create -n test-environment -c conda-forge local::slycot nose qt=3
   - activate test-environment
 
   - python --version
