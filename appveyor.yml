@@ -28,6 +28,7 @@ test_script:
 
   # test with python-control
   - conda install -c conda-forge scipy matplotlib
-  - git clone --depth 1 https://github.com/python-control/python-control.git control
+  - git clone --depth 1 https://github.com/roryyorke/python-control.git control
   - cd control
+  - git log -1 --pretty=short
   - python setup.py test
