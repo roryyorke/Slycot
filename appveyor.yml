@@ -1,14 +1,6 @@
 # appveyor.com continuous integration configuration file
 # see https://www.appveyor.com/docs/windows-images-software/#miniconda for pre-installed Miniconda info
 # "C:\\Miniconda36-x64\\Scripts" and "C:\\Miniconda36-x64\\Library\\bin" might not be necessary.
-platform: x64
-
-environment:
-  matrix:
-    # - SLYCOT_PYTHON_VERSION: 3.5
-    # - SLYCOT_PYTHON_VERSION: 3.6
-    - SLYCOT_PYTHON_VERSION: 3.7
-
 install:
   - "set PATH=C:\\Miniconda36-x64;C:\\Miniconda36-x64\\Scripts;C:\\Miniconda36-x64\\Library\\bin;%PATH%"
   - conda config --set always_yes yes --set changeps1 no
@@ -18,21 +10,24 @@ install:
   - conda info -a
 
 build_script: 
-  - conda build -c conda-forge --python %SLYCOT_PYTHON_VERSION% conda-recipe-openblas
+  - conda build -c conda-forge conda-recipe-openblas
 
 test_script:
-  # force qt version 4 for now; see https://github.com/ContinuumIO/anaconda-issues/issues/1068
-  # not quite sure this is the same issue
-  - conda create -n test-environment -c conda-forge local::slycot nose
+  - conda create -n test-environment
   - activate test-environment
+  - conda info -a
+  - python -VV
+  - python -c "import platform; print(platform.architecture())"
+  - which python
 
-  - python --version
+  - conda install -c conda-forge local::slycot
+  - conda install nose # for tests
 
   - cd ..
   - python Slycot/runtests.py --coverage --no-build
 
   # test with python-control
-  - conda install -c conda-forge scipy matplotlib qt=4 numpy>=1.14
+  - conda install -c conda-forge scipy matplotlib
   - git clone --depth 1 https://github.com/python-control/python-control.git control
   - cd control
   - python setup.py test
