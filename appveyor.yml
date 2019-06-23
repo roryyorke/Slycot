@@ -3,8 +3,8 @@
 # "C:\\Miniconda36-x64\\Scripts" and "C:\\Miniconda36-x64\\Library\\bin" might not be necessary.
 environment:
   matrix:
-    - SLYCOT_PYTHON_VERSION: 3.5
-    - SLYCOT_PYTHON_VERSION: 3.6
+    # - SLYCOT_PYTHON_VERSION: 3.5
+    # - SLYCOT_PYTHON_VERSION: 3.6
     - SLYCOT_PYTHON_VERSION: 3.7
 
 install:
@@ -21,7 +21,7 @@ build_script:
 test_script:
   # force qt version 4 for now; see https://github.com/ContinuumIO/anaconda-issues/issues/1068
   # not quite sure this is the same issue
-  - conda create -n test-environment -c conda-forge local::slycot nose qt=4
+  - conda create -n test-environment -c conda-forge local::slycot nose
   - activate test-environment
 
   - python --version
@@ -30,7 +30,7 @@ test_script:
   - python Slycot/runtests.py --coverage --no-build
 
   # test with python-control
-  - conda install -c conda-forge scipy matplotlib
+  - conda install -c conda-forge scipy matplotlib qt=4 numpy>=1.14
   - git clone --depth 1 https://github.com/python-control/python-control.git control
   - cd control
   - python setup.py test
