@@ -1,6 +1,8 @@
 # appveyor.com continuous integration configuration file
 # see https://www.appveyor.com/docs/windows-images-software/#miniconda for pre-installed Miniconda info
 # "C:\\Miniconda36-x64\\Scripts" and "C:\\Miniconda36-x64\\Library\\bin" might not be necessary.
+platform: x64
+
 environment:
   matrix:
     # - SLYCOT_PYTHON_VERSION: 3.5
