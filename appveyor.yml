@@ -10,7 +10,7 @@ install:
   - conda info -a
 
 build_script: 
-  - conda build -c conda-forge conda-recipe-openblas
+  - conda build -c conda-forge conda-recipe
 
 test_script:
   - conda create -n test-environment
