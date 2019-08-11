@@ -175,4 +175,4 @@ script:
 
 
 after_success:
-  - coveralls
+  - coveralls --base_dir ..
