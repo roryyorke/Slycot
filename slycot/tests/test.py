@@ -49,9 +49,6 @@ class Test(unittest.TestCase):
         self.assertAlmostEqual(Ac[1][0], 1)
         self.assertAlmostEqual(Ac[1][1], -3)
 
-def suite():
-   return unittest.TestLoader().loadTestsFromTestCase(TestConvert)
-
 
 if __name__ == "__main__":
     unittest.main()
