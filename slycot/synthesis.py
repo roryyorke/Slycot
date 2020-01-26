@@ -1974,6 +1974,8 @@ def sg03ad(dico,job,fact,trans,uplo,N,A,E,Q,Z,X,ldwork=None):
               = 'L':  Only the lower triangle is needed on input;
               = 'U':  Only the upper triangle is needed on input.
 
+        N : The order of the matrix A.  N >= 0.
+
         A : input rank-2 array('d') with bounds (n,n)
             On entry, if FACT = 'F', then the leading N-by-N upper
             Hessenberg part of this array must contain the
@@ -2133,7 +2135,7 @@ def sg03ad(dico,job,fact,trans,uplo,N,A,E,Q,Z,X,ldwork=None):
     """
 
     hidden = ' (hidden by the wrapper)'
-    arg_list = ['dico', 'job', 'fact', 'trans', 'uplo', 'N'+hidden, 'A', 'LDA'+hidden, 'E',
+    arg_list = ['dico', 'job', 'fact', 'trans', 'uplo', 'N', 'A', 'LDA'+hidden, 'E',
                 'LDE'+hidden, 'Q', 'LDQ'+hidden, 'Z', 'LDZ'+hidden, 'X', 'LDX'+hidden,
                 'scale', 'sep', 'ferr', 'alphar', 'alphai', 'beta', 'IWORK'+hidden,
                 'DWORK'+hidden, 'ldwork', 'info' ]
