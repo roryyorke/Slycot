@@ -1,8 +1,8 @@
 set(PYSOURCE
 
   __init__.py
-
   test.py
+  test_ab08n.py
   test_ag08bd.py
   test_mb.py
   test_mc.py
