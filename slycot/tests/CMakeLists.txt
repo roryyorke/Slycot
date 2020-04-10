@@ -3,7 +3,6 @@ set(PYSOURCE
   __init__.py
   test_ag08bd.py
   test_mb.py
-  test_mb03schur.py
   test_mc.py
   test_sb10jd.py
   test_sg02ad.py
