@@ -489,16 +489,22 @@ def sb02mt(n,m,B,R,A=None,Q=None,L=None,fact='N',jobl='Z',uplo='U',ldwork=None):
         if fact == 'N':
             out = _wrapper.sb02mt_n(n,m,B,R,uplo=uplo,ldwork=ldwork)
         if out is None:
-            raise ValueError('fact must be either C or N.')
+            e = ValueError('fact must be either C or N.')
+            e.info = -3
+            raise e
     else:
         if A is None or Q is None or L is None:
-            raise ValueError('matrices A,Q and L are required if jobl is not Z.')
+            e = ValueError('matrices A,Q and L are required if jobl is not Z.')
+            e.info = -7
+            raise e
         if fact == 'C':
             out = _wrapper.sb02mt_cl(n,m,A,B,Q,R,L,uplo=uplo)
         if fact == 'N':
             out = _wrapper.sb02mt_nl(n,m,A,B,Q,R,L,uplo=uplo,ldwork=ldwork)
         if out is None:
-            raise ValueError('fact must be either C or N.')
+            e = ValueError('fact must be either C or N.')
+            e.info = -3
+            raise e
     if out[-1] < 0:
         error_text = "The following argument had an illegal value: "+arg_list[-out[-1]-1]
         e = ValueError(error_text)
@@ -689,20 +695,20 @@ def sb02od(n,m,A,B,Q,R,dico,p=None,L=None,fact='N',uplo='U',sort='S',tol=0.0,ldw
         out = _wrapper.sb02od_n(dico,n,m,A,B,Q,R,L,uplo=uplo,jobl=jobl,sort=sort,tol=tol,ldwork=ldwork)
     if fact == 'C':
         if p is None:
-            p = shape(Q)[0]
+            p = _np.shape(Q)[0]
         out = _wrapper.sb02od_c(dico,n,m,p,A,B,Q,R,L,uplo=uplo,jobl=jobl,sort=sort,tol=tol,ldwork=ldwork)
     if fact == 'D':
         if p is None:
-            p = shape(R)[0]
+            p = _np.shape(R)[0]
         out = _wrapper.sb02od_d(dico,n,m,p,A,B,Q,R,L,uplo=uplo,jobl=jobl,sort=sort,tol=tol,ldwork=ldwork)
     if fact == 'B':
         if p is None:
-            p = shape(Q)[0]
+            p = _np.shape(Q)[0]
         out = _wrapper.sb02od_b(dico,n,m,p,A,B,Q,R,L,uplo=uplo,jobl=jobl,sort=sort,tol=tol,ldwork=ldwork)
     if out[-1] < 0:
         error_text = "The following argument had an illegal value: "+arg_list[-out[-1]-1]
         e = ValueError(error_text)
-        e.info = info
+        e.info = out[-1]
         raise e
     if out[-1] == 1:
         e = ValueError('the computed extended matrix pencil is singular, possibly due to rounding errors')
@@ -850,7 +856,9 @@ def sb03md(n,C,A,U,dico,job='X',fact='N',trana='N',ldwork=None):
     if ldwork is None:
         ldwork = max(2*n*n,3*n)
     if dico != 'C' and dico != 'D':
-        raise ValueError('dico must be either D or C')
+        e = ValueError('dico must be either D or C')
+        e.info = -1
+        raise e
     out = _wrapper.sb03md(dico,n,C,A,U,job=job,fact=fact,trana=trana,ldwork=ldwork)
     if out[-1] < 0:
         error_text = "The following argument had an illegal value: "+arg_list[-out[-1]-1]
@@ -1041,7 +1049,9 @@ def sb03od(n,m,A,Q,B,dico,fact='N',trans='N',ldwork=None):
         elif m == 0:
             ldwork = 1
     if dico != 'C' and dico != 'D':
-        raise ValueError('dico must be either D or C')
+        e = ValueError('dico must be either D or C')
+        e.info = -1
+        raise e
     out = _wrapper.sb03od(dico,n,m,A,Q,B,fact=fact,trans=trans,ldwork=ldwork)
     if out[-1] < 0:
         error_text = "The following argument had an illegal value: "+arg_list[-out[-1]-1]
@@ -2748,7 +2758,9 @@ def sg03bd(n,m,A,E,Q,Z,B,dico,fact='N',trans='N',ldwork=None):
     if ldwork is None:
         ldwork = max(1,4*n,6*n-6)
     if dico != 'C' and dico != 'D':
-        raise ValueError('dico must be either D or C')
+        e = ValueError('dico must be either D or C')
+        e.info = -1
+        raise e
     out = _wrapper.sg03bd(dico,n,m,A,E,Q,Z,B,fact=fact,trans=trans,ldwork=ldwork)
     if out[-1] < 0:
         error_text = "The following argument had an illegal value: "+arg_list[-out[-1]-1]
