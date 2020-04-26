@@ -12,5 +12,5 @@ include slycot/tests/CMakeLists.txt
 include slycot/*.py
 include slycot/version.py.in
 include slycot/src/*.f
-include slycot/tests/*.py
+include test/tests/
 include runtests.py

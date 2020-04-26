@@ -166,5 +166,3 @@ target_include_directories(
 python_extension_module(${SLYCOT_MODULE})
 install(TARGETS ${SLYCOT_MODULE} DESTINATION slycot)
 install(FILES ${PYSOURCE} DESTINATION slycot)
-
-add_subdirectory(tests)
