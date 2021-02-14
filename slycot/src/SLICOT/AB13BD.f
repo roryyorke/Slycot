@@ -278,6 +278,7 @@ C
 C
 C        Error return.
 C
+         AB13BD   = ZERO
          CALL XERBLA( 'AB13BD', -INFO )
          RETURN
       END IF
@@ -286,6 +287,7 @@ C     Compute the Frobenius norm of D.
 C
       S2NORM = DLANGE( 'Frobenius', P, M, D, LDD, DWORK )
       IF( .NOT.DISCR .AND. S2NORM.NE.ZERO ) THEN
+         AB13BD   = ZERO
          INFO = 5
          RETURN
       END IF
