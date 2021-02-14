@@ -1,23 +1,9 @@
       SUBROUTINE MB03VY( N, P, ILO, IHI, A, LDA1, LDA2, TAU, LDTAU,
      $                   DWORK, LDWORK, INFO )
 C
-C     SLICOT RELEASE 5.0.
+C     SLICOT RELEASE 5.7.
 C
-C     Copyright (c) 2002-2009 NICONET e.V.
-C
-C     This program is free software: you can redistribute it and/or
-C     modify it under the terms of the GNU General Public License as
-C     published by the Free Software Foundation, either version 2 of
-C     the License, or (at your option) any later version.
-C
-C     This program is distributed in the hope that it will be useful,
-C     but WITHOUT ANY WARRANTY; without even the implied warranty of
-C     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-C     GNU General Public License for more details.
-C
-C     You should have received a copy of the GNU General Public License
-C     along with this program.  If not, see
-C     <http://www.gnu.org/licenses/>.
+C     Copyright (c) 2002-2020 NICONET e.V.
 C
 C     PURPOSE
 C
@@ -80,6 +66,12 @@ C     LDWORK  INTEGER
 C             The length of the array DWORK.  LDWORK >= MAX(1,N).
 C             For optimum performance LDWORK should be larger.
 C
+C             If LDWORK = -1, then a workspace query is assumed;
+C             the routine only calculates the optimal size of the
+C             DWORK array, returns this value as the first entry of
+C             the DWORK array, and no error message related to LDWORK
+C             is issued by XERBLA.
+C
 C     Error Indicator
 C
 C     INFO    INTEGER
@@ -119,7 +111,8 @@ C     (DLR Oberpfaffenhofen), November 26, 1995.
 C
 C     REVISIONS
 C
-C     V. Sima, Research Institute for Informatics, Bucharest, Feb. 2004.
+C     V. Sima, Research Institute for Informatics, Bucharest, Feb. 2004,
+C     July 2012.
 C
 C     KEYWORDS
 C
@@ -139,14 +132,14 @@ C     .. Array Arguments ..
       DOUBLE PRECISION  A( LDA1, LDA2, * ), DWORK( * ), TAU( LDTAU, * )
 C     ..
 C     .. Local Scalars ..
-      INTEGER           J, NH
-      DOUBLE PRECISION  WRKOPT
+      LOGICAL           LQUERY
+      INTEGER           J, NH, WRKOPT
 C     ..
 C     .. External Subroutines ..
       EXTERNAL          DLASET, DORGHR, DORGQR, XERBLA
 C     ..
 C     .. Intrinsic Functions ..
-      INTRINSIC         MAX, MIN
+      INTRINSIC         INT, MAX, MIN
 C     ..
 C     .. Executable Statements ..
 C
@@ -167,6 +160,19 @@ C
          INFO = -7
       ELSE IF( LDTAU.LT.MAX( 1, N-1 ) ) THEN
          INFO = -9
+      ELSE
+         NH = IHI - ILO + 1
+         LQUERY = LDWORK.EQ.-1
+         IF( LQUERY ) THEN
+            CALL DORGHR( N, ILO, IHI, A, LDA1, TAU, DWORK, -1, INFO )
+            WRKOPT = MAX( 1, N, INT( DWORK( 1 ) ) )
+            IF ( NH.GT.1 ) THEN
+               CALL DORGQR( NH, NH, NH-1, A, LDA1, TAU, DWORK, -1, INFO)
+               WRKOPT = MAX( WRKOPT, INT( DWORK( 1 ) ) )
+            END IF
+         END IF
+         IF( LDWORK.LT.MAX( 1, N ) .AND. .NOT. LQUERY )
+     $      INFO = -11
       END IF
       IF( INFO.NE.0 ) THEN
          CALL XERBLA( 'MB03VY', -INFO )
@@ -178,14 +184,15 @@ C
       IF ( N.EQ.0 ) THEN
          DWORK( 1 ) = ONE
          RETURN
+      ELSE IF( LQUERY ) THEN
+         DWORK( 1 ) = WRKOPT
+         RETURN
       END IF
 C
 C     Generate the orthogonal matrix Q_1.
 C
       CALL DORGHR( N, ILO, IHI, A, LDA1, TAU, DWORK, LDWORK, INFO )
-      WRKOPT = DWORK( 1 )
-C
-      NH = IHI - ILO + 1
+      WRKOPT = INT( DWORK( 1 ) )
 C
       DO 20 J = 2, P
 C
@@ -209,7 +216,7 @@ C
          END IF
    20 CONTINUE
 C
-      DWORK( 1 ) = MAX( WRKOPT, DWORK( 1 ) )
+      DWORK( 1 ) = MAX( WRKOPT, INT( DWORK( 1 ) ) )
       RETURN
 C
 C *** Last line of MB03VY ***

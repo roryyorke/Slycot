@@ -2,23 +2,9 @@
      $                   NR, PR, NINFZ, DINFZ, NKRONL, INFZ, KRONL,
      $                   TOL, IWORK, DWORK, ZWORK, LZWORK, INFO )
 C
-C     SLICOT RELEASE 5.0.
+C     SLICOT RELEASE 5.7.
 C
-C     Copyright (c) 2002-2009 NICONET e.V.
-C
-C     This program is free software: you can redistribute it and/or
-C     modify it under the terms of the GNU General Public License as
-C     published by the Free Software Foundation, either version 2 of
-C     the License, or (at your option) any later version.
-C
-C     This program is distributed in the hope that it will be useful,
-C     but WITHOUT ANY WARRANTY; without even the implied warranty of
-C     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-C     GNU General Public License for more details.
-C
-C     You should have received a copy of the GNU General Public License
-C     along with this program.  If not, see
-C     <http://www.gnu.org/licenses/>.
+C     Copyright (c) 2002-2020 NICONET e.V.
 C
 C     PURPOSE
 C
@@ -232,6 +218,8 @@ C
 C     REVISIONS
 C
 C     V. Sima, Research Institute for Informatics, Bucharest, Apr. 2009.
+C     V. Sima, Jan. 2010, following Bujanovic and Drmac's suggestion.
+C     V. Sima, Apr. 2011.
 C
 C     KEYWORDS
 C
@@ -243,8 +231,8 @@ C
 C     .. Parameters ..
       INTEGER            IMAX, IMIN
       PARAMETER          ( IMAX = 1, IMIN = 2 )
-      DOUBLE PRECISION   ONE, P05, ZERO
-      PARAMETER          ( ONE = 1.0D0, P05 = 0.05D0, ZERO = 0.0D0 )
+      DOUBLE PRECISION   ONE, ZERO
+      PARAMETER          ( ONE = 1.0D0, ZERO = 0.0D0 )
       COMPLEX*16         CONE, CZERO
       PARAMETER          ( CONE = ( 1.0D+0, 0.0D+0 ),
      $                    CZERO = ( 0.0D+0, 0.0D+0 ) )
@@ -261,21 +249,21 @@ C     .. Local Scalars ..
       LOGICAL            LQUERY
       INTEGER            I, ICOL, ILAST, IRC, IROW, ISMAX, ISMIN, ITAU,
      $                   J, JLAST, JWORK1, JWORK2, K, MN, MN1, MNR,
-     $                   MNTAU, MP1, MPM, MUI, MUIM1, N1, NB, NBLCKS,
-     $                   PN, RANK, RO, RO1, SIGMA, TAUI, WRKOPT
-      DOUBLE PRECISION   C, RCOND, SMAX, SMAXPR, SMIN, SMINPR, T, TT
+     $                   MNTAU, MP1, MPM, MUI, MUIM1, N1, NBLCKS, PN,
+     $                   RANK, RO, RO1, SIGMA, TAUI, WRKOPT
+      DOUBLE PRECISION   C, RCOND, SMAX, SMAXPR, SMIN, SMINPR, T, TOLZ,
+     $                   TT
       COMPLEX*16         C1, C2, S, S1, S2, TC
 C     .. Local Arrays ..
       DOUBLE PRECISION   SVAL(3)
       COMPLEX*16         DUM(1)
 C     .. External Functions ..
-      INTEGER            IDAMAX, ILAENV
+      INTEGER            IDAMAX
       DOUBLE PRECISION   DLAMCH, DZNRM2
-      EXTERNAL           DLAMCH, DZNRM2, IDAMAX, ILAENV
+      EXTERNAL           DLAMCH, DZNRM2, IDAMAX
 C     .. External Subroutines ..
       EXTERNAL           MB3OYZ, XERBLA, ZCOPY, ZLAIC1, ZLAPMT, ZLARFG,
-     $                   ZLARTG, ZLASET, SLCT_ZLATZM, ZROT, ZSWAP,
-     $                   ZUNMQR
+     $                   ZLARTG, ZLASET, ZLATZM, ZROT, ZSWAP, ZUNMQR
 C     .. Intrinsic Functions ..
       INTRINSIC          ABS, DBLE, DCONJG, INT, MAX, MIN, SQRT
 C     .. Executable Statements ..
@@ -309,9 +297,10 @@ C
                IF( FIRST ) THEN
                   WRKOPT = MAX( WRKOPT, MPM + MAX( 3*M-1, N ) )
                   IF( LQUERY ) THEN
-                     NB = MIN( 64, ILAENV( 1, 'ZUNMQR', 'LC', P, N,
-     $                                     MPM, -1 ) )
-                     WRKOPT = MAX( WRKOPT, MPM + MAX( 1, N )*NB )
+                     CALL ZUNMQR( 'Left', 'ConjTranspose', P, N, MPM,
+     $                            ABCD, LDABCD, ZWORK, ABCD, LDABCD,
+     $                            ZWORK, -1, INFO )
+                     WRKOPT = MAX( WRKOPT, MPM + INT( ZWORK(1) ) )
                   END IF
                END IF
             END IF
@@ -350,6 +339,7 @@ C
          RETURN
       END IF
 C
+      TOLZ  = SQRT( DLAMCH( 'Epsilon' ) )
       RCOND = TOL
       IF( RCOND.LE.ZERO ) THEN
 C
@@ -407,8 +397,7 @@ C
             IROW = IROW + 1
             CALL ZLARFG( RO+1, ABCD(IROW,ICOL), ABCD(IROW+1,ICOL), 1,
      $                   TC )
-C           RvP, replaced by slicot replacement for obsolete lapack routine
-            CALL SLCT_ZLATZM( 'L', RO+1, MNR-ICOL, ABCD(IROW+1,ICOL), 1,
+            CALL ZLATZM( 'L', RO+1, MNR-ICOL, ABCD(IROW+1,ICOL), 1,
      $                   DCONJG( TC ), ABCD(IROW,ICOL+1),
      $                   ABCD(IROW+1,ICOL+1), LDABCD, ZWORK )
             CALL ZCOPY( PR-ICOL, DUM, 0, ABCD(IROW+1,ICOL), 1 )
@@ -598,12 +587,10 @@ C
                         IF( I-1.GT.1 ) THEN
                            DO 60 J = 1, I - 1
                               IF( DWORK(J).NE.ZERO ) THEN
-                                 T = ONE - ( ABS( ABCD(IRC+J,ICOL) )
-     $                                   /DWORK(J) )**2
-                                 T = MAX( T, ZERO )
-                                 TT = ONE +
-     $                                P05*T*( DWORK(J)/DWORK(P+J) )**2
-                                 IF( TT.NE.ONE ) THEN
+                                 T = ABS( ABCD(IRC+J,ICOL) ) / DWORK(J)
+                                 T = MAX( ( ONE + T )*( ONE - T ), ZERO)
+                                 TT = T*( DWORK(J)/DWORK(P+J) )**2
+                                 IF( TT.GT.TOLZ ) THEN
                                     DWORK(J) = DWORK(J)*SQRT( T )
                                  ELSE
                                     DWORK(J) = DZNRM2( N1-1,

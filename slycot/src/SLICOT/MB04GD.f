@@ -1,22 +1,8 @@
       SUBROUTINE MB04GD( M, N, A, LDA, JPVT, TAU, DWORK, INFO )
 C
-C     SLICOT RELEASE 5.0.
+C     SLICOT RELEASE 5.7.
 C
-C     Copyright (c) 2002-2009 NICONET e.V.
-C
-C     This program is free software: you can redistribute it and/or
-C     modify it under the terms of the GNU General Public License as
-C     published by the Free Software Foundation, either version 2 of
-C     the License, or (at your option) any later version.
-C
-C     This program is distributed in the hope that it will be useful,
-C     but WITHOUT ANY WARRANTY; without even the implied warranty of
-C     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-C     GNU General Public License for more details.
-C
-C     You should have received a copy of the GNU General Public License
-C     along with this program.  If not, see
-C     <http://www.gnu.org/licenses/>.
+C     Copyright (c) 2002-2020 NICONET e.V.
 C
 C     PURPOSE
 C
@@ -60,7 +46,7 @@ C             The scalar factors of the elementary reflectors.
 C
 C     Workspace
 C
-C     DWORK    DOUBLE PRECISION array, dimension (3*M)
+C     DWORK   DOUBLE PRECISION array, dimension (3*M)
 C
 C     Error Indicator
 C
@@ -106,7 +92,7 @@ C     Based on LAPACK Library routines DGEQPF and DGERQ2.
 C
 C     REVISIONS
 C
-C     -
+C     V. Sima, Jan. 2010, following Bujanovic and Drmac's suggestion.
 C
 C     KEYWORDS
 C
@@ -116,8 +102,8 @@ C
 C     ******************************************************************
 C
 C     .. Parameters ..
-      DOUBLE PRECISION   ZERO, ONE, P05
-      PARAMETER          ( ZERO = 0.0D+0, ONE = 1.0D+0, P05 = 0.05D+0 )
+      DOUBLE PRECISION   ZERO, ONE
+      PARAMETER          ( ZERO = 0.0D+0, ONE = 1.0D+0 )
 C     ..
 C     .. Scalar Arguments ..
       INTEGER            INFO, LDA, M, N
@@ -128,12 +114,12 @@ C     .. Array Arguments ..
 C     ..
 C     .. Local Scalars ..
       INTEGER            I, ITEMP, J, K, MA, MKI, NFREE, NKI, PVT
-      DOUBLE PRECISION   AII, TEMP, TEMP2
+      DOUBLE PRECISION   AII, TEMP, TEMP2, TOLZ
 C     ..
 C     .. External Functions ..
       INTEGER            IDAMAX
-      DOUBLE PRECISION   DNRM2
-      EXTERNAL           DNRM2, IDAMAX
+      DOUBLE PRECISION   DLAMCH, DNRM2
+      EXTERNAL           DLAMCH, DNRM2, IDAMAX
 C     ..
 C     .. External Subroutines ..
       EXTERNAL           DGERQ2, DLARF, DLARFG, DORMR2, DSWAP, XERBLA
@@ -178,6 +164,7 @@ C
          END IF
    10 CONTINUE
       NFREE = M - ITEMP
+      TOLZ  = SQRT( DLAMCH( 'Epsilon' ) )
 C
 C     Compute the RQ factorization and update remaining rows.
 C
@@ -237,11 +224,10 @@ C           Update partial row norms.
 C
             DO 30 J = 1, MKI - 1
                IF( DWORK( J ).NE.ZERO ) THEN
-                  TEMP = ONE - ( ABS( A( J, NKI ) ) / DWORK( J ) )**2
-                  TEMP = MAX( TEMP, ZERO )
-                  TEMP2 = ONE + P05*TEMP*
-     $                    ( DWORK( J ) / DWORK( M+J ) )**2
-                  IF( TEMP2.EQ.ONE ) THEN
+                  TEMP = ABS( A( J, NKI ) ) / DWORK( J )
+                  TEMP = MAX( ( ONE + TEMP )*( ONE - TEMP ), ZERO )
+                  TEMP2 = TEMP*( DWORK( J ) / DWORK( M+J ) )**2
+                  IF( TEMP2.LE.TOLZ ) THEN
                      DWORK( J ) = DNRM2( NKI-1, A( J, 1 ), LDA )
                      DWORK( M+J ) = DWORK( J )
                   ELSE

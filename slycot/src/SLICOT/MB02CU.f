@@ -1,23 +1,9 @@
       SUBROUTINE MB02CU( TYPEG, K, P, Q, NB, A1, LDA1, A2, LDA2, B, LDB,
      $                   RNK, IPVT, CS, TOL, DWORK, LDWORK, INFO )
 C
-C     SLICOT RELEASE 5.0.
+C     SLICOT RELEASE 5.7.
 C
-C     Copyright (c) 2002-2009 NICONET e.V.
-C
-C     This program is free software: you can redistribute it and/or
-C     modify it under the terms of the GNU General Public License as
-C     published by the Free Software Foundation, either version 2 of
-C     the License, or (at your option) any later version.
-C
-C     This program is distributed in the hope that it will be useful,
-C     but WITHOUT ANY WARRANTY; without even the implied warranty of
-C     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-C     GNU General Public License for more details.
-C
-C     You should have received a copy of the GNU General Public License
-C     along with this program.  If not, see
-C     <http://www.gnu.org/licenses/>.
+C     Copyright (c) 2002-2020 NICONET e.V.
 C
 C     PURPOSE
 C
@@ -216,6 +202,7 @@ C
 C     V. Sima, Research Institute for Informatics, Bucharest, June 2001.
 C     D. Kressner, Technical Univ. Berlin, Germany, July 2002.
 C     V. Sima, Research Institute for Informatics, Bucharest, Mar. 2004.
+C     V. Sima, Jan. 2010, following Bujanovic and Drmac's suggestion.
 C
 C     KEYWORDS
 C
@@ -225,8 +212,8 @@ C
 C     ******************************************************************
 C
 C     .. Parameters ..
-      DOUBLE PRECISION   ZERO, ONE, P05
-      PARAMETER          ( ZERO = 0.0D+0, ONE = 1.0D+0, P05 = 0.05D0 )
+      DOUBLE PRECISION   ZERO, ONE
+      PARAMETER          ( ZERO = 0.0D+0, ONE = 1.0D+0 )
 C     .. Scalar Arguments ..
       CHARACTER          TYPEG
       INTEGER            INFO, K, LDA1, LDA2, LDB, LDWORK, NB, P, Q, RNK
@@ -240,12 +227,12 @@ C     .. Local Scalars ..
       INTEGER            COL2, I, IB, IERR, IMAX, ITEMP, J, JJ, LEN,
      $                   NBL, PDW, PHV, POS, PST2, PVT, WRKMIN
       DOUBLE PRECISION   ALPHA, ALPHA2, BETA, C, DMAX, S, TAU1, TAU2,
-     $                   TEMP, TEMP2
+     $                   TEMP, TEMP2, TOLZ
 C     .. External Functions ..
       LOGICAL            LSAME
       INTEGER            IDAMAX
-      DOUBLE PRECISION   DLAPY2, DNRM2
-      EXTERNAL           IDAMAX, DLAPY2, DNRM2, LSAME
+      DOUBLE PRECISION   DLAMCH, DLAPY2, DNRM2
+      EXTERNAL           DLAMCH, DLAPY2, DNRM2, IDAMAX, LSAME
 C     .. External Subroutines ..
       EXTERNAL           DAXPY, DGELQ2, DGEQR2, DLARF, DLARFB, DLARFG,
      $                   DLARFT, DLARTG, DROT, DSCAL, DSWAP, MA02FD,
@@ -310,6 +297,8 @@ C
      $      RNK = 0
          RETURN
       END IF
+C
+      TOLZ = SQRT( DLAMCH( 'Epsilon' ) )
 C
       IF ( LRDEF ) THEN
 C
@@ -465,10 +454,10 @@ C
 C              Downdate the norms in A1.
 C
                DO 50  J = I + 1, K
-                  TEMP  = ONE - ( ABS( A1(J,I) ) / DWORK(J) )**2
-                  TEMP2 = ONE + P05*TEMP*
-     $                          ( DWORK(J) / DWORK(K+J) )**2
-                  IF ( TEMP2.EQ.ONE ) THEN
+                  TEMP = ABS( A1(J,I) ) / DWORK(J)
+                  TEMP = MAX( ( ONE + TEMP )*( ONE - TEMP ), ZERO )
+                  TEMP2 = TEMP*( DWORK(J) / DWORK(K+J) )**2
+                  IF( TEMP2.LE.TOLZ ) THEN
                      DWORK(J) = DLAPY2( DNRM2( K-I, A1(J,I+1), LDA1 ),
      $                                  DNRM2( COL2, A2(J,1), LDA2 ) )
                      DWORK(K+J)   = DWORK(J)
@@ -580,12 +569,10 @@ C                 Downdate the norms of the rows in the negative part.
 C
                   DO 70  JJ = J + 1, K
                      IF ( DWORK(JJ).NE.ZERO ) THEN
-                        TEMP  = ONE - ( ABS( B(JJ,POS) )
-     $                                 / DWORK(JJ) )**2
-                        TEMP  = MAX( TEMP, ZERO )
-                        TEMP2 = ONE + P05*TEMP*
-     $                               ( DWORK(JJ) / DWORK(K+JJ) )**2
-                        IF ( TEMP2.EQ.ONE ) THEN
+                        TEMP = ABS( B(JJ,POS) ) / DWORK(JJ)
+                        TEMP = MAX( ( ONE + TEMP )*( ONE - TEMP ), ZERO)
+                        TEMP2 = TEMP*( DWORK(JJ) / DWORK(K+JJ) )**2
+                        IF( TEMP2.LE.TOLZ ) THEN
                            DWORK(JJ)   = DNRM2( LEN-1, B(JJ,POS+1), LDB)
                            DWORK(K+JJ) = DWORK(JJ)
                         ELSE

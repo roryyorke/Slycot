@@ -1,23 +1,9 @@
       SUBROUTINE MB3OYZ( M, N, A, LDA, RCOND, SVLMAX, RANK, SVAL, JPVT,
      $                   TAU, DWORK, ZWORK, INFO )
 C
-C     SLICOT RELEASE 5.0.
+C     SLICOT RELEASE 5.7.
 C
-C     Copyright (c) 2002-2009 NICONET e.V.
-C
-C     This program is free software: you can redistribute it and/or
-C     modify it under the terms of the GNU General Public License as
-C     published by the Free Software Foundation, either version 2 of
-C     the License, or (at your option) any later version.
-C
-C     This program is distributed in the hope that it will be useful,
-C     but WITHOUT ANY WARRANTY; without even the implied warranty of
-C     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-C     GNU General Public License for more details.
-C
-C     You should have received a copy of the GNU General Public License
-C     along with this program.  If not, see
-C     <http://www.gnu.org/licenses/>.
+C     Copyright (c) 2002-2020 NICONET e.V.
 C
 C     PURPOSE
 C
@@ -175,7 +161,7 @@ C     Bucharest, Nov. 2008.
 C
 C     REVISIONS
 C
-C     -
+C     V. Sima, Jan. 2010, following Bujanovic and Drmac's suggestion.
 C
 C     KEYWORDS
 C
@@ -187,8 +173,8 @@ C
 C     .. Parameters ..
       INTEGER            IMAX, IMIN
       PARAMETER          ( IMAX = 1, IMIN = 2 )
-      DOUBLE PRECISION   ZERO, ONE, P05
-      PARAMETER          ( ZERO = 0.0D+0, ONE = 1.0D+0, P05 = 0.05D+0 )
+      DOUBLE PRECISION   ZERO, ONE
+      PARAMETER          ( ZERO = 0.0D+0, ONE = 1.0D+0 )
       COMPLEX*16         CZERO, CONE
       PARAMETER          ( CZERO = ( 0.0D+0, 0.0D+0 ),
      $                     CONE  = ( 1.0D+0, 0.0D+0 ) )
@@ -203,12 +189,12 @@ C     ..
 C     .. Local Scalars ..
       INTEGER            I, ISMAX, ISMIN, ITEMP, J, MN, PVT
       COMPLEX*16         AII, C1, C2, S1, S2
-      DOUBLE PRECISION   SMAX, SMAXPR, SMIN, SMINPR, TEMP, TEMP2
+      DOUBLE PRECISION   SMAX, SMAXPR, SMIN, SMINPR, TEMP, TEMP2, TOLZ
 C     ..
 C     .. External Functions ..
       INTEGER            IDAMAX
-      DOUBLE PRECISION   DZNRM2
-      EXTERNAL           DZNRM2, IDAMAX
+      DOUBLE PRECISION   DLAMCH, DZNRM2
+      EXTERNAL           DLAMCH, DZNRM2, IDAMAX
 C     .. External Subroutines ..
       EXTERNAL           XERBLA, ZLAIC1, ZLARF, ZLARFG, ZSCAL, ZSWAP
 C     .. Intrinsic Functions ..
@@ -247,6 +233,7 @@ C
          RETURN
       END IF
 C
+      TOLZ  = SQRT( DLAMCH( 'Epsilon' ) )
       ISMIN = 1
       ISMAX = ISMIN + N
 C
@@ -339,12 +326,10 @@ C                 Update partial column norms.
 C
                   DO 30 J = I + 1, N
                      IF( DWORK( J ).NE.ZERO ) THEN
-                        TEMP = ONE -
-     $                            ( ABS( A( I, J ) ) / DWORK( J ) )**2
-                        TEMP = MAX( TEMP, ZERO )
-                        TEMP2 = ONE + P05*TEMP*
-     $                            ( DWORK( J ) / DWORK( N+J ) )**2
-                        IF( TEMP2.EQ.ONE ) THEN
+                        TEMP = ABS( A( I, J ) ) / DWORK( J )
+                        TEMP = MAX( ( ONE + TEMP )*( ONE - TEMP ), ZERO)
+                        TEMP2 = TEMP*( DWORK( J ) / DWORK( N+J ) )**2
+                        IF( TEMP2.LE.TOLZ ) THEN
                            IF( M-I.GT.0 ) THEN
                               DWORK( J ) = DZNRM2( M-I, A( I+1, J ), 1 )
                               DWORK( N+J ) = DWORK( J )

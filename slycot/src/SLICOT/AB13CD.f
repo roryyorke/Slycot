@@ -3,23 +3,9 @@
      $                                  LDWORK, CWORK, LCWORK, BWORK,
      $                                  INFO )
 C
-C     SLICOT RELEASE 5.0.
+C     SLICOT RELEASE 5.7.
 C
-C     Copyright (c) 2002-2009 NICONET e.V.
-C
-C     This program is free software: you can redistribute it and/or
-C     modify it under the terms of the GNU General Public License as
-C     published by the Free Software Foundation, either version 2 of
-C     the License, or (at your option) any later version.
-C
-C     This program is distributed in the hope that it will be useful,
-C     but WITHOUT ANY WARRANTY; without even the implied warranty of
-C     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-C     GNU General Public License for more details.
-C
-C     You should have received a copy of the GNU General Public License
-C     along with this program.  If not, see
-C     <http://www.gnu.org/licenses/>.
+C     Copyright (c) 2002-2020 NICONET e.V.
 C
 C     PURPOSE
 C
@@ -86,7 +72,7 @@ C             norm.
 C
 C     Workspace
 C
-C     IWORK   INTEGER array, dimension N
+C     IWORK   INTEGER array, dimension (N)
 C
 C     DWORK   DOUBLE PRECISION array, dimension (LDWORK)
 C             On exit, if INFO = 0, DWORK(1) contains the optimal value
@@ -151,7 +137,8 @@ C     V. Sima, Research Institute for Informatics, Bucharest, Aug. 1999,
 C     Oct. 2000.
 C     P.Hr. Petkov, October 2000.
 C     A. Varga, October 2000.
-C     Oct. 2001, V. Sima, Research Institute for Informatics, Bucharest.
+C     V. Sima, Research Institute for Informatics, Bucharest, Oct. 2001,
+C     July 2011.
 C
 C     KEYWORDS
 C
@@ -237,7 +224,6 @@ C
          INFO = -17
       END IF
       IF( INFO.NE.0 ) THEN
-         AB13CD   = ZERO
          CALL XERBLA( 'AB13CD', -INFO )
          RETURN
       END IF
@@ -245,7 +231,7 @@ C
 C     Quick return if possible.
 C
       IF( M.EQ.0 .OR. NP.EQ.0 ) THEN
-         AB13CD   = ZERO
+         AB13CD = ZERO
          RETURN
       END IF
 C
@@ -266,7 +252,6 @@ C
      $             INFO2 )
       IF( INFO2.GT.0 ) THEN
          INFO = 4
-         AB13CD   = ZERO
          RETURN
       END IF
       GAMMAL = DWORK( IW6+1 )

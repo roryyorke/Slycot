@@ -2,23 +2,9 @@
      $                   B, LDB, C, LDC, NR, INFRED, TOL, IWORK, DWORK,
      $                   LDWORK, INFO )
 C
-C     SLICOT RELEASE 5.0.
+C     SLICOT RELEASE 5.7.
 C
-C     Copyright (c) 2002-2009 NICONET e.V.
-C
-C     This program is free software: you can redistribute it and/or
-C     modify it under the terms of the GNU General Public License as
-C     published by the Free Software Foundation, either version 2 of
-C     the License, or (at your option) any later version.
-C
-C     This program is distributed in the hope that it will be useful,
-C     but WITHOUT ANY WARRANTY; without even the implied warranty of
-C     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-C     GNU General Public License for more details.
-C
-C     You should have received a copy of the GNU General Public License
-C     along with this program.  If not, see
-C     <http://www.gnu.org/licenses/>.
+C     Copyright (c) 2002-2020 NICONET e.V.
 C
 C     PURPOSE
 C
@@ -185,18 +171,19 @@ C             DLAMCH).  TOL < 1.
 C
 C     Workspace
 C
-C     IWORK   INTEGER array, dimension N+MAX(M,P)
+C     IWORK   INTEGER array, dimension ((c*N+MAX(M,P)), where
+C             c = 2, if JOB = 'I' or SYSTYP = 'R', and c = 1, otherwise.
 C             On exit, if INFO = 0, the leading INFRED(7) elements of
 C             IWORK contain the orders of the diagonal blocks of
 C             Ar-lambda*Er.
 C
-C     DWORK   DOUBLE PRECISION array, dimension LDWORK
+C     DWORK   DOUBLE PRECISION array, dimension (LDWORK)
 C
 C     LDWORK  INTEGER
 C             The length of the array DWORK.
 C             LDWORK >= MAX(8*N,2*M,2*P), if EQUIL = 'S';
 C             LDWORK >= MAX(N,2*M,2*P),   if EQUIL = 'N'.
-C             If LDWORK >= MAX(2*N*N+N*M+N*P)+MAX(N,2*M,2*P) then more
+C             If LDWORK >= 2*N*N+N*M+N*P+MAX(N,2*M,2*P) then more
 C             accurate results are to be expected by performing only
 C             those reductions phases (see METHOD), where effective
 C             order reduction occurs. This is achieved by saving the
@@ -214,7 +201,7 @@ C     METHOD
 C
 C     The subroutine is based on the reduction algorithms of [1].
 C     The order reduction is performed in 4 phases:
-C     Phase 1: Eliminate all finite uncontrolable eigenvalues.
+C     Phase 1: Eliminate all finite uncontrollable eigenvalues.
 C              The resulting matrix ( Br Ar ) is in a controllable
 C              staircase form (see SLICOT Library routine TG01HD), and
 C              Er is upper triangular.
@@ -268,7 +255,7 @@ C     REVISIONS
 C
 C     July 1999, V. Sima, Research Institute for Informatics, Bucharest.
 C     May 2003, A. Varga, German Aerospace Center, DLR Oberpfaffenhofen.
-C     May 2003, March 2004, V. Sima.
+C     May 2003, March 2004, March 2017, April 2017, V. Sima.
 C
 C     KEYWORDS
 C
@@ -289,10 +276,11 @@ C     .. Array Arguments ..
       DOUBLE PRECISION  A(LDA,*), B(LDB,*), C(LDC,*), DWORK(*), E(LDE,*)
 C     .. Local Scalars ..
       CHARACTER         JOBQ, JOBZ
-      LOGICAL           FINCON, FINOBS, INFCON, INFOBS, LEQUIL, LJOBC,
-     $                  LJOBIR, LJOBO, LSPACE, LSYSP, LSYSR, LSYSS
-      INTEGER           KWA, KWB, KWC, KWE, LBA, LBE, LDM, LDP, LDQ,
-     $                  LDZ, M1, MAXMP, N1, NBLCK, NC, P1
+      LOGICAL           DONE1, DONE2, DONE3, FINCON, FINOBS, INFCON,
+     $                  INFOBS, LEQUIL, LJOBC, LJOBIR, LJOBO, LSPACE,
+     $                  LSYSP, LSYSR, LSYSS
+      INTEGER           I, IB, KWA, KWB, KWC, KWE, LBA, LBE, LDM, LDP,
+     $                  LDQ, LDZ, M1, MAXMP, N1, NBLCK, NC, P1
 C     .. Local Arrays ..
       DOUBLE PRECISION  DUM(1)
 C     .. External Functions ..
@@ -410,12 +398,17 @@ C
       LBE = LBA
       NC = N
       NR = N
+      IB = 1
+C
+      DONE1 = .FALSE.
+      DONE2 = .FALSE.
+      DONE3 = .FALSE.
 C
       IF( FINCON ) THEN
 C
-C        Phase 1: Eliminate all finite uncontrolable eigenvalues.
+C        Phase 1: Eliminate all finite uncontrollable eigenvalues.
 C
-         IF( LSPACE) THEN
+         IF( LSPACE ) THEN
 C
 C           Save system matrices.
 C
@@ -431,7 +424,8 @@ C
          CALL TG01HX( JOBQ, JOBZ, NC, NC, M, P, NC, LBE, A, LDA,
      $                E, LDE, B, LDB, C, LDP, DUM, LDQ, DUM, LDZ, NR,
      $                NBLCK, IWORK, TOL, IWORK(N+1), DWORK, INFO )
-         IF( NR.LT.NC .OR. .NOT.LSPACE ) THEN
+         DONE1 = NR.LT.NC .OR. .NOT.LSPACE
+         IF( DONE1 ) THEN
             IF( NBLCK.GT.1 ) THEN
                LBA = IWORK(1) + IWORK(2) - 1
             ELSE IF( NBLCK.EQ.1 ) THEN
@@ -443,6 +437,7 @@ C
             INFRED(1) = NC - NR
             INFRED(7) = NBLCK
             NC = NR
+            IB = N + 1
          ELSE
 C
 C           Restore system matrices.
@@ -457,9 +452,9 @@ C
       IF( INFCON ) THEN
 C
 C        Phase 2: Eliminate all infinite and all finite nonzero
-C                 uncontrolable eigenvalues.
+C                 uncontrollable eigenvalues.
 C
-         IF( LSPACE ) THEN
+         IF( LSPACE .AND. ( .NOT.FINCON .OR. DONE1 ) ) THEN
 C
 C           Save system matrices.
 C
@@ -474,12 +469,13 @@ C        Workspace: need   MAX(N,2*M).
 C
          CALL TG01HX( JOBQ, JOBZ, NC, NC, M, P, NC, LBA, E, LDE,
      $                A, LDA, B, LDB, C, LDP, DUM, LDQ, DUM, LDZ, NR,
-     $                NBLCK, IWORK, TOL, IWORK(N+1), DWORK, INFO )
-         IF( NR.LT.NC .OR. .NOT.LSPACE ) THEN
+     $                NBLCK, IWORK(IB), TOL, IWORK(IB+N), DWORK, INFO )
+         DONE2 = NR.LT.NC .OR. .NOT.LSPACE
+         IF( DONE2 ) THEN
             IF( NBLCK.GT.1 ) THEN
-               LBE = IWORK(1) + IWORK(2) - 1
+               LBE = IWORK(IB) + IWORK(IB+1) - 1
             ELSE IF( NBLCK.EQ.1 ) THEN
-               LBE = IWORK(1) - 1
+               LBE = IWORK(IB) - 1
             ELSE
                LBE = 0
             END IF
@@ -487,6 +483,13 @@ C
             INFRED(2) = NC - NR
             INFRED(7) = NBLCK
             NC = NR
+            IF ( DONE1 ) THEN
+               DO 10 I = 1, NBLCK
+                  IWORK(I) = IWORK(IB+I-1)
+   10          CONTINUE
+            ELSE
+               IB = N + 1
+            END IF
          ELSE
 C
 C           Restore system matrices.
@@ -498,7 +501,7 @@ C
          END IF
       END IF
 C
-      IF( FINOBS .OR. INFOBS) THEN
+      IF( FINOBS .OR. INFOBS ) THEN
 C
 C        Compute the pertransposed dual system exploiting matrix shapes.
 C
@@ -526,12 +529,13 @@ C        Workspace: need   MAX(N,2*P).
 C
          CALL TG01HX( JOBZ, JOBQ, NC, NC, P, M, NC, LBE, A, LDA,
      $                E, LDE, B, LDB, C, LDM, DUM, LDZ, DUM, LDQ, NR,
-     $                NBLCK, IWORK, TOL, IWORK(N+1), DWORK, INFO )
-         IF( NR.LT.NC .OR. .NOT.LSPACE ) THEN
+     $                NBLCK, IWORK(IB), TOL, IWORK(IB+N), DWORK, INFO )
+         DONE3 = NR.LT.NC .OR. .NOT.LSPACE
+         IF( DONE3 ) THEN
             IF( NBLCK.GT.1 ) THEN
-               LBA = IWORK(1) + IWORK(2) - 1
+               LBA = IWORK(IB) + IWORK(IB+1) - 1
             ELSE IF( NBLCK.EQ.1 ) THEN
-               LBA = IWORK(1) - 1
+               LBA = IWORK(IB) - 1
             ELSE
                LBA = 0
             END IF
@@ -539,6 +543,13 @@ C
             INFRED(3) = NC - NR
             INFRED(7) = NBLCK
             NC = NR
+            IF ( DONE1 .OR. DONE2 ) THEN
+               DO 20 I = 1, NBLCK
+                  IWORK(I) = IWORK(IB+I-1)
+   20          CONTINUE
+            ELSE
+               IB = N + 1
+            END IF
          ELSE
 C
 C           Restore system matrices.
@@ -555,7 +566,8 @@ C
 C        Phase 4: Eliminate all infinite and all finite nonzero
 C                 unobservable eigenvalues.
 C
-         IF( LSPACE) THEN
+         IF( LSPACE .AND. ( .NOT.FINOBS .OR. DONE3 ) ) THEN
+C
 C
 C           Save system matrices.
 C
@@ -570,12 +582,12 @@ C        Workspace: need   MAX(N,2*P).
 C
          CALL TG01HX( JOBZ, JOBQ, NC, NC, P, M, NC, LBA, E, LDE,
      $                A, LDA, B, LDB, C, LDM, DUM, LDZ, DUM, LDQ, NR,
-     $                NBLCK, IWORK, TOL, IWORK(N+1), DWORK, INFO )
+     $                NBLCK, IWORK(IB), TOL, IWORK(IB+N), DWORK, INFO )
          IF( NR.LT.NC .OR. .NOT.LSPACE ) THEN
             IF( NBLCK.GT.1 ) THEN
-               LBE = IWORK(1) + IWORK(2) - 1
+               LBE = IWORK(IB) + IWORK(IB+1) - 1
             ELSE IF( NBLCK.EQ.1 ) THEN
-               LBE = IWORK(1) - 1
+               LBE = IWORK(IB) - 1
             ELSE
                LBE = 0
             END IF
@@ -583,6 +595,11 @@ C
             INFRED(4) = NC - NR
             INFRED(7) = NBLCK
             NC = NR
+            IF ( DONE1 .OR. DONE2 .OR. DONE3 ) THEN
+               DO 30 I = 1, NBLCK
+                  IWORK(I) = IWORK(IB+I-1)
+   30          CONTINUE
+            END IF
          ELSE
 C
 C           Restore system matrices.

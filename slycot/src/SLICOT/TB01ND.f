@@ -1,23 +1,9 @@
       SUBROUTINE TB01ND( JOBU, UPLO, N, P, A, LDA, C, LDC, U, LDU,
      $                   DWORK, INFO )
 C
-C     SLICOT RELEASE 5.0.
+C     SLICOT RELEASE 5.7.
 C
-C     Copyright (c) 2002-2009 NICONET e.V.
-C
-C     This program is free software: you can redistribute it and/or
-C     modify it under the terms of the GNU General Public License as
-C     published by the Free Software Foundation, either version 2 of
-C     the License, or (at your option) any later version.
-C
-C     This program is distributed in the hope that it will be useful,
-C     but WITHOUT ANY WARRANTY; without even the implied warranty of
-C     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-C     GNU General Public License for more details.
-C
-C     You should have received a copy of the GNU General Public License
-C     along with this program.  If not, see
-C     <http://www.gnu.org/licenses/>.
+C     Copyright (c) 2002-2020 NICONET e.V.
 C
 C     PURPOSE
 C
@@ -195,7 +181,7 @@ C     .. External Functions ..
       LOGICAL           LSAME
       EXTERNAL          LSAME
 C     .. External Subroutines ..
-      EXTERNAL          DLARFG, DLASET, SLCT_DLATZM, XERBLA
+      EXTERNAL          DLARFG, DLASET, DLATZM, XERBLA
 C     .. Intrinsic Functions ..
       INTRINSIC         MAX, MIN
 C     .. Executable Statements ..
@@ -269,16 +255,16 @@ C
 C
 C        Update A.
 C
-         CALL SLCT_DLATZM( 'Left', NJ+1, N, C(PAR1,PAR3), LDC, DZ,
-     $                A(PAR2,1), A(PAR3,1), LDA, DWORK )
-         CALL SLCT_DLATZM( 'Right', N, NJ+1, C(PAR1,PAR3), LDC, DZ,
+         CALL DLATZM( 'Left', NJ+1, N, C(PAR1,PAR3), LDC, DZ, A(PAR2,1),
+     $                A(PAR3,1), LDA, DWORK )
+         CALL DLATZM( 'Right', N, NJ+1, C(PAR1,PAR3), LDC, DZ,
      $                A(1,PAR2), A(1,PAR3), LDA, DWORK )
 C
          IF ( LJOBA ) THEN
 C
 C           Update U.
 C
-            CALL SLCT_DLATZM( 'Right', N, NJ+1, C(PAR1,PAR3), LDC, DZ,
+            CALL DLATZM( 'Right', N, NJ+1, C(PAR1,PAR3), LDC, DZ,
      $                   U(1,PAR2), U(1,PAR3), LDU, DWORK )
          END IF
 C
@@ -286,8 +272,7 @@ C
 C
 C           Update C.
 C
-            CALL SLCT_DLATZM( 'Right', PAR4-PAR3+1, NJ+1,
-     $                   C(PAR1,PAR3), LDC,
+            CALL DLATZM( 'Right', PAR4-PAR3+1, NJ+1, C(PAR1,PAR3), LDC,
      $                   DZ, C(PAR3,PAR2), C(PAR3,PAR3), LDC, DWORK )
          END IF
 C
@@ -324,18 +309,16 @@ C
 C
 C           Update A.
 C
-            CALL SLCT_DLATZM( 'Left', NJ+1, N, A(PAR1,PAR3), LDA, DZ,
+            CALL DLATZM( 'Left', NJ+1, N, A(PAR1,PAR3), LDA, DZ,
      $                   A(PAR2,1), A(PAR3,1), LDA, DWORK )
-            CALL SLCT_DLATZM( 'Right', PAR6-PAR5+1, NJ+1, A(PAR1,PAR3),
-     $                    LDA,
+            CALL DLATZM( 'Right', PAR6-PAR5+1, NJ+1, A(PAR1,PAR3), LDA,
      $                    DZ, A(PAR5,PAR2), A(PAR5,PAR3), LDA, DWORK )
 C
             IF ( LJOBA ) THEN
 C
 C              Update U.
 C
-               CALL SLCT_DLATZM( 'Right', N, NJ+1, A(PAR1,PAR3),
-     $                      LDA, DZ,
+               CALL DLATZM( 'Right', N, NJ+1, A(PAR1,PAR3), LDA, DZ,
      $                      U(1,PAR2), U(1,PAR3), LDU, DWORK )
             END IF
 C

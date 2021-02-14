@@ -1,23 +1,9 @@
       SUBROUTINE SB03OD( DICO, FACT, TRANS, N, M, A, LDA, Q, LDQ, B,
      $                   LDB, SCALE, WR, WI, DWORK, LDWORK, INFO )
 C
-C     SLICOT RELEASE 5.0.
+C     SLICOT RELEASE 5.7.
 C
-C     Copyright (c) 2002-2009 NICONET e.V.
-C
-C     This program is free software: you can redistribute it and/or
-C     modify it under the terms of the GNU General Public License as
-C     published by the Free Software Foundation, either version 2 of
-C     the License, or (at your option) any later version.
-C
-C     This program is distributed in the hope that it will be useful,
-C     but WITHOUT ANY WARRANTY; without even the implied warranty of
-C     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-C     GNU General Public License for more details.
-C
-C     You should have received a copy of the GNU General Public License
-C     along with this program.  If not, see
-C     <http://www.gnu.org/licenses/>.
+C     Copyright (c) 2002-2020 NICONET e.V.
 C
 C     PURPOSE
 C
@@ -146,6 +132,12 @@ C             The length of the array DWORK.
 C             If M > 0, LDWORK >= MAX(1,4*N + MIN(M,N));
 C             If M = 0, LDWORK >= 1.
 C             For optimum performance LDWORK should sometimes be larger.
+C
+C             If LDWORK = -1, then a workspace query is assumed; the
+C             routine only calculates the optimal size of the DWORK
+C             array, returns this value as the first entry of the DWORK
+C             array, and no error message related to LDWORK is issued by
+C             XERBLA.
 C
 C     Error Indicator
 C
@@ -313,6 +305,7 @@ C     REVISIONS
 C
 C     Dec. 1997, April 1998, May 1998, May 1999, Oct. 2001 (V. Sima).
 C     March 2002 (A. Varga).
+C     V. Sima, Research Institute for Informatics, Bucharest, July 2011.
 C
 C     KEYWORDS
 C
@@ -332,9 +325,9 @@ C     .. Array Arguments ..
       DOUBLE PRECISION  A(LDA,*), B(LDB,*), DWORK(*), Q(LDQ,*), WI(*),
      $                  WR(*)
 C     .. Local Scalars ..
-      LOGICAL           CONT, LTRANS, NOFACT
-      INTEGER           I, IFAIL, INFORM, ITAU, J, JWORK, K, L, MINMN,
-     $                  NE, SDIM, WRKOPT
+      LOGICAL           CONT, LQUERY, LTRANS, NOFACT
+      INTEGER           I, IFAIL, INFORM, ITAU, J, JWORK, K, L, MAXMN,
+     $                  MINMN, MINWRK, NE, SDIM, WRKOPT
       DOUBLE PRECISION  EMAX, TEMP
 C     .. Local Arrays ..
       LOGICAL           BWORK(1)
@@ -354,7 +347,9 @@ C
       CONT   = LSAME( DICO,  'C' )
       NOFACT = LSAME( FACT,  'N' )
       LTRANS = LSAME( TRANS, 'T' )
+      LQUERY = LDWORK.EQ.-1
       MINMN  = MIN( M, N )
+      MAXMN  = MAX( M, N )
 C
       INFO = 0
       IF( .NOT.CONT .AND. .NOT.LSAME( DICO, 'D' ) ) THEN
@@ -372,11 +367,35 @@ C
       ELSE IF( LDQ.LT.MAX( 1, N ) ) THEN
          INFO = -9
       ELSE IF( ( LDB.LT.MAX( 1, N ) )  .OR.
-     $         ( LDB.LT.MAX( 1, N, M ) .AND. .NOT.LTRANS ) ) THEN
+     $         ( LDB.LT.MAX( 1, MAXMN ) .AND. .NOT.LTRANS ) ) THEN
          INFO = -11
-      ELSE IF( LDWORK.LT.1 .OR. ( M.GT.0 .AND. LDWORK.LT.4*N + MINMN ) )
-     $      THEN
-         INFO = -16
+      ELSE
+         IF( M.GT.0 ) THEN
+            MINWRK = 4*N + MINMN
+         ELSE
+            MINWRK = 1
+         END IF
+         IF( LQUERY ) THEN
+            IF ( NOFACT ) THEN
+               CALL DGEES( 'Vectors', 'Not ordered', SELECT, N, A, LDA,
+     $                     SDIM, WR, WI, Q, LDQ, DWORK, -1, BWORK,
+     $                     IFAIL )
+               WRKOPT = MAX( MINWRK, INT( DWORK(1) ) )
+            ELSE
+               WRKOPT = MINWRK
+            END IF
+            IF ( LTRANS ) THEN
+               CALL DGERQF( N, MAXMN, B, LDB, DWORK, DWORK, -1, IFAIL )
+            ELSE
+               CALL DGEQRF( MAXMN, N, B, LDB, DWORK, DWORK, -1, IFAIL )
+            END IF
+            WRKOPT = MAX( WRKOPT, INT( DWORK(1) ) + MAXMN, MINMN*N )
+            CALL SB03OU( .NOT.CONT, LTRANS, N, MINMN, A, LDA, B, LDB,
+     $                   DWORK, B, LDB, SCALE, DWORK, -1, INFO )
+            WRKOPT = MAX( WRKOPT, INT( DWORK(1) ) + MINMN, N*N )
+         ELSE IF( LDWORK.LT.MINWRK ) THEN
+            INFO = -16
+         END IF
       END IF
 C
       IF ( INFO.NE.0 ) THEN
@@ -384,6 +403,9 @@ C
 C        Error return.
 C
          CALL XERBLA( 'SB03OD', -INFO )
+         RETURN
+      ELSE IF( LQUERY ) THEN
+         DWORK(1) = WRKOPT
          RETURN
       END IF
 C

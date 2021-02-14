@@ -2,23 +2,9 @@
      $                   NINFZ, INFZ, KRONL, MU, NU, NKROL, TOL, IWORK,
      $                   DWORK, ZWORK, LZWORK, INFO )
 C
-C     SLICOT RELEASE 5.0.
+C     SLICOT RELEASE 5.7.
 C
-C     Copyright (c) 2002-2009 NICONET e.V.
-C
-C     This program is free software: you can redistribute it and/or
-C     modify it under the terms of the GNU General Public License as
-C     published by the Free Software Foundation, either version 2 of
-C     the License, or (at your option) any later version.
-C
-C     This program is distributed in the hope that it will be useful,
-C     but WITHOUT ANY WARRANTY; without even the implied warranty of
-C     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-C     GNU General Public License for more details.
-C
-C     You should have received a copy of the GNU General Public License
-C     along with this program.  If not, see
-C     <http://www.gnu.org/licenses/>.
+C     Copyright (c) 2002-2020 NICONET e.V.
 C
 C     PURPOSE
 C
@@ -171,7 +157,8 @@ C     The MathWorks.
 C
 C     REVISIONS
 C
-C     V. Sima, Research Institute for Informatics, Bucharest, Apr. 2009.
+C     V. Sima, Research Institute for Informatics, Bucharest, Apr. 2009,
+C     Apr. 2011.
 C
 C     KEYWORDS
 C
@@ -196,16 +183,13 @@ C     .. Array Arguments ..
 C     .. Local Scalars ..
       LOGICAL           LQUERY
       INTEGER           I1, IK, IROW, ITAU, IZ, JWORK, MM1, MNTAU, MNU,
-     $                  MPM, NB, NP, RANK, RO1, TAU, WRKOPT
-      COMPLEX*16        TC, TCCONJ
+     $                  MPM, NP, RANK, RO1, TAU, WRKOPT
+      COMPLEX*16        TC
 C     .. Local Arrays ..
       DOUBLE PRECISION  SVAL(3)
-C     .. External Functions ..
-      INTEGER           ILAENV
-      EXTERNAL          ILAENV
 C     .. External Subroutines ..
       EXTERNAL          MB3OYZ, MB3PYZ, XERBLA, ZLAPMT, ZLARFG, ZLASET,
-     $                  SLCT_ZLATZM, ZUNMQR, ZUNMRQ
+     $                  ZLATZM, ZUNMQR, ZUNMRQ
 C     .. Intrinsic Functions ..
       INTRINSIC         DCONJG, INT, MAX, MIN
 C     .. Executable Statements ..
@@ -238,18 +222,21 @@ C
      $                MIN( P, N ) + MAX( 3*P - 1, NP, N+M ) )
          IF( LQUERY ) THEN
             IF( M.GT.0 ) THEN
-               NB = MIN( 64, ILAENV( 1, 'ZUNMQR', 'LC', P, N, MPM,
-     $                               -1 ) )
-               WRKOPT = MAX( JWORK, MPM + MAX( 1, N )*NB )
+               CALL ZUNMQR( 'Left', 'Conjugate', P, N, MPM, ABCD,
+     $                      LDABCD, ZWORK, ABCD, LDABCD, ZWORK, -1,
+     $                      INFO )
+               WRKOPT = MAX( JWORK, MPM + INT( ZWORK(1) ) )
             ELSE
                WRKOPT = JWORK
             END IF
-            NB = MIN( 64, ILAENV( 1, 'ZUNMRQ', 'RC', NP, N, MIN( P, N ),
-     $                            -1 ) )
-            WRKOPT = MAX( WRKOPT, MIN( P, N ) + MAX( 1, NP )*NB )
-            NB = MIN( 64, ILAENV( 1, 'ZUNMRQ', 'LN', N, M+N,
-     $                            MIN( P, N ), -1 ) )
-            WRKOPT = MAX( WRKOPT, MIN( P, N ) + MAX( 1, M+N )*NB )
+            CALL ZUNMRQ( 'Right', 'ConjTranspose', NP, N, MIN( P, N ),
+     $                   ABCD, LDABCD, ZWORK, ABCD, LDABCD, ZWORK, -1,
+     $                   INFO )
+            WRKOPT = MAX( WRKOPT, MIN( P, N ) + INT( ZWORK(1) ) )
+            CALL ZUNMRQ( 'Left', 'NoTranspose', N, M+N, MIN( P, N ),
+     $                   ABCD, LDABCD, ZWORK, ABCD, LDABCD, ZWORK, -1,
+     $                   INFO )
+            WRKOPT = MAX( WRKOPT, MIN( P, N ) + INT( ZWORK(1) ) )
          ELSE IF( LZWORK.LT.JWORK ) THEN
             INFO = -19
          END IF
@@ -315,9 +302,7 @@ C
             DO 40 I1 = 1, SIGMA
                CALL ZLARFG( RO+1, ABCD(IROW,I1), ABCD(IROW+1,I1), 1,
      $                      TC )
-C     RvP 170623 slicot-specific ZLATZM
-               TCCONJ = DCONJG( TC )
-               CALL SLCT_ZLATZM( 'L', RO+1, MNU-I1, ABCD(IROW+1,I1), 1,
+               CALL ZLATZM( 'L', RO+1, MNU-I1, ABCD(IROW+1,I1), 1,
      $                      DCONJG( TC ), ABCD(IROW,I1+1),
      $                      ABCD(IROW+1,I1+1), LDABCD, ZWORK )
                IROW = IROW + 1

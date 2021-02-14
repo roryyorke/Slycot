@@ -1,23 +1,9 @@
       SUBROUTINE SB06ND( N, M, KMAX, A, LDA, B, LDB, KSTAIR, U, LDU, F,
      $                   LDF, DWORK, INFO )
 C
-C     SLICOT RELEASE 5.0.
+C     SLICOT RELEASE 5.7.
 C
-C     Copyright (c) 2002-2009 NICONET e.V.
-C
-C     This program is free software: you can redistribute it and/or
-C     modify it under the terms of the GNU General Public License as
-C     published by the Free Software Foundation, either version 2 of
-C     the License, or (at your option) any later version.
-C
-C     This program is distributed in the hope that it will be useful,
-C     but WITHOUT ANY WARRANTY; without even the implied warranty of
-C     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-C     GNU General Public License for more details.
-C
-C     You should have received a copy of the GNU General Public License
-C     along with this program.  If not, see
-C     <http://www.gnu.org/licenses/>.
+C     Copyright (c) 2002-2020 NICONET e.V.
 C
 C     PURPOSE
 C
@@ -183,8 +169,8 @@ C     .. Local Scalars ..
       INTEGER           J, J0, JCUR, JKCUR, JMKCUR, KCUR, KK, KMIN,
      $                  KSTEP, MKCUR, NCONT
 C     .. External Subroutines ..
-      EXTERNAL          DCOPY, DGEMM, DLACPY, DLARFG, DLASET,
-     $                  SLCT_DLATZM, DTRSM, XERBLA
+      EXTERNAL          DCOPY, DGEMM, DLACPY, DLARFG, DLASET, DLATZM,
+     $                  DTRSM, XERBLA
 C     .. Executable Statements ..
 C
       INFO = 0
@@ -250,11 +236,11 @@ C
 C
 C              Backmultiply A and U with Ukk.
 C
-               CALL SLCT_DLATZM( 'Right', JCUR-1, KCUR+1, F(1,JCUR), 1,
+               CALL DLATZM( 'Right', JCUR-1, KCUR+1, F(1,JCUR), 1,
      $                      DWORK(JCUR), A(1,JCUR), A(1,JMKCUR), LDA,
      $                      DWORK )
 C
-               CALL SLCT_DLATZM( 'Right', N, KCUR+1, F(1,JCUR), 1,
+               CALL DLATZM( 'Right', N, KCUR+1, F(1,JCUR), 1,
      $                      DWORK(JCUR), U(1,JCUR), U(1,JMKCUR), LDU,
      $                      DWORK(N+1) )
                JCUR = JCUR - 1
@@ -291,8 +277,7 @@ C
                JCUR = JKCUR - KCUR
 C
                DO 60 J = 1, KCUR
-                  CALL SLCT_DLATZM( 'Left', KCUR+1, N-JCUR+1,
-     $                         F(1,JKCUR), 1,
+                  CALL DLATZM( 'Left', KCUR+1, N-JCUR+1, F(1,JKCUR), 1,
      $                         DWORK(JKCUR), A(JKCUR,JCUR),
      $                         A(JCUR,JCUR), LDA, DWORK(N+1) )
                   JCUR = JCUR - 1
@@ -307,7 +292,7 @@ C
             JKCUR = JCUR + KCUR
 C
             DO 100 J = M, M - KCUR + 1, -1
-               CALL SLCT_DLATZM( 'Left', KCUR+1, M-J+1, F(1,JKCUR), 1,
+               CALL DLATZM( 'Left', KCUR+1, M-J+1, F(1,JKCUR), 1,
      $                      DWORK(JKCUR), B(JKCUR,J), B(JCUR,J), LDB,
      $                      DWORK(N+1) )
                JCUR = JCUR - 1

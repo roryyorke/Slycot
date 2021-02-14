@@ -1,23 +1,9 @@
       SUBROUTINE MB03PY( M, N, A, LDA, RCOND, SVLMAX, RANK, SVAL, JPVT,
      $                   TAU, DWORK, INFO )
 C
-C     SLICOT RELEASE 5.0.
+C     SLICOT RELEASE 5.7.
 C
-C     Copyright (c) 2002-2009 NICONET e.V.
-C
-C     This program is free software: you can redistribute it and/or
-C     modify it under the terms of the GNU General Public License as
-C     published by the Free Software Foundation, either version 2 of
-C     the License, or (at your option) any later version.
-C
-C     This program is distributed in the hope that it will be useful,
-C     but WITHOUT ANY WARRANTY; without even the implied warranty of
-C     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-C     GNU General Public License for more details.
-C
-C     You should have received a copy of the GNU General Public License
-C     along with this program.  If not, see
-C     <http://www.gnu.org/licenses/>.
+C     Copyright (c) 2002-2020 NICONET e.V.
 C
 C     PURPOSE
 C
@@ -176,6 +162,8 @@ C     REVISIONS
 C
 C     V. Sima, Research Institute for Informatics, Bucharest, Oct. 2001,
 C     Jan. 2009.
+C     V. Sima, Jan. 2010, following Bujanovic and Drmac's suggestion.
+C     V. Sima, Apr. 2017, Mar. 2019.
 C
 C     KEYWORDS
 C
@@ -187,8 +175,8 @@ C
 C     .. Parameters ..
       INTEGER            IMAX, IMIN
       PARAMETER          ( IMAX = 1, IMIN = 2 )
-      DOUBLE PRECISION   ZERO, ONE, P05
-      PARAMETER          ( ZERO = 0.0D+0, ONE = 1.0D+0, P05 = 0.05D+0 )
+      DOUBLE PRECISION   ZERO, ONE
+      PARAMETER          ( ZERO = 0.0D+0, ONE = 1.0D+0 )
 C     .. Scalar Arguments ..
       INTEGER            INFO, LDA, M, N, RANK
       DOUBLE PRECISION   RCOND, SVLMAX
@@ -199,12 +187,12 @@ C     .. Local Scalars ..
       INTEGER            I, ISMAX, ISMIN, ITEMP, J, JWORK, K, MKI, NKI,
      $                   PVT
       DOUBLE PRECISION   AII, C1, C2, S1, S2, SMAX, SMAXPR, SMIN,
-     $                   SMINPR, TEMP, TEMP2
+     $                   SMINPR, TEMP, TEMP2, TOLZ
 C     ..
 C     .. External Functions ..
       INTEGER            IDAMAX
-      DOUBLE PRECISION   DNRM2
-      EXTERNAL           DNRM2, IDAMAX
+      DOUBLE PRECISION   DLAMCH, DNRM2
+      EXTERNAL           DLAMCH, DNRM2, IDAMAX
 C     ..
 C     .. External Subroutines ..
       EXTERNAL           DCOPY, DLAIC1, DLARF, DLARFG, DSCAL, DSWAP,
@@ -246,6 +234,7 @@ C
          RETURN
       END IF
 C
+      TOLZ  = SQRT( DLAMCH( 'Epsilon' ) )
       ISMIN = M
       ISMAX = ISMIN + M
       JWORK = ISMAX + 1
@@ -296,14 +285,13 @@ C
 C
          IF( RANK.EQ.0 ) THEN
 C
-C           Initialize; exit if matrix is zero (RANK = 0).
+C           Initialize; exit if the matrix is negligible (RANK = 0).
 C
             SMAX = ABS( A( M, N ) )
-            IF ( SMAX.EQ.ZERO ) THEN
+            IF ( SMAX.LE.RCOND ) THEN
                SVAL( 1 ) = ZERO
                SVAL( 2 ) = ZERO
                SVAL( 3 ) = ZERO
-               RETURN
             END IF
             SMIN = SMAX
             SMAXPR = SMAX
@@ -323,7 +311,7 @@ C
 C
          IF( SVLMAX*RCOND.LE.SMAXPR ) THEN
             IF( SVLMAX*RCOND.LE.SMINPR ) THEN
-               IF( SMAXPR*RCOND.LE.SMINPR ) THEN
+               IF( SMAXPR*RCOND.LT.SMINPR ) THEN
 C
                   IF( MKI.GT.1 ) THEN
 C
@@ -340,12 +328,11 @@ C                    Update partial row norms.
 C
                      DO 30 J = 1, MKI - 1
                         IF( DWORK( J ).NE.ZERO ) THEN
-                           TEMP  = ONE -
-     $                             ( ABS( A( J, NKI ) )/DWORK( J ) )**2
-                           TEMP  = MAX( TEMP, ZERO )
-                           TEMP2 = ONE + P05*TEMP*
-     $                                 ( DWORK( J ) / DWORK( M+J ) )**2
-                           IF( TEMP2.EQ.ONE ) THEN
+                           TEMP = ABS( A( J, NKI ) ) / DWORK( J )
+                           TEMP = MAX( ( ONE + TEMP )*( ONE - TEMP ),
+     $                                 ZERO )
+                           TEMP2 = TEMP*( DWORK( J ) / DWORK( M+J ) )**2
+                           IF( TEMP2.LE.TOLZ ) THEN
                               DWORK( J )   = DNRM2( NKI-1, A( J, 1 ),
      $                                              LDA )
                               DWORK( M+J ) = DWORK( J )

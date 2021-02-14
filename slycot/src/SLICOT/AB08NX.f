@@ -2,23 +2,9 @@
      $                   NINFZ, INFZ, KRONL, MU, NU, NKROL, TOL, IWORK,
      $                   DWORK, LDWORK, INFO )
 C
-C     SLICOT RELEASE 5.0.
+C     SLICOT RELEASE 5.7.
 C
-C     Copyright (c) 2002-2009 NICONET e.V.
-C
-C     This program is free software: you can redistribute it and/or
-C     modify it under the terms of the GNU General Public License as
-C     published by the Free Software Foundation, either version 2 of
-C     the License, or (at your option) any later version.
-C
-C     This program is distributed in the hope that it will be useful,
-C     but WITHOUT ANY WARRANTY; without even the implied warranty of
-C     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-C     GNU General Public License for more details.
-C
-C     You should have received a copy of the GNU General Public License
-C     along with this program.  If not, see
-C     <http://www.gnu.org/licenses/>.
+C     Copyright (c) 2002-2020 NICONET e.V.
 C
 C     PURPOSE
 C
@@ -168,7 +154,7 @@ C     Supersedes Release 2.0 routine AB08BZ by F. Svaricek.
 C
 C     REVISIONS
 C
-C     V. Sima, Oct. 1997; Feb. 1998, Jan. 2009, Apr. 2009.
+C     V. Sima, Oct. 1997; Feb. 1998, Jan. 2009, Apr. 2009, Apr. 2011.
 C     A. Varga, May 1999; May 2001.
 C
 C     KEYWORDS
@@ -191,16 +177,13 @@ C     .. Array Arguments ..
 C     .. Local Scalars ..
       LOGICAL           LQUERY
       INTEGER           I1, IK, IROW, ITAU, IZ, JWORK, MM1, MNTAU, MNU,
-     $                  MPM, NB, NP, RANK, RO1, TAU, WRKOPT
+     $                  MPM, NP, RANK, RO1, TAU, WRKOPT
       DOUBLE PRECISION  T
 C     .. Local Arrays ..
       DOUBLE PRECISION  SVAL(3)
-C     .. External Functions ..
-      INTEGER           ILAENV
-      EXTERNAL          ILAENV
 C     .. External Subroutines ..
-      EXTERNAL          DLAPMT, DLARFG, DLASET, SLCT_DLATZM, DORMQR,
-     $                  DORMRQ, MB03OY, MB03PY, XERBLA
+      EXTERNAL          DLAPMT, DLARFG, DLASET, DLATZM, DORMQR, DORMRQ,
+     $                  MB03OY, MB03PY, XERBLA
 C     .. Intrinsic Functions ..
       INTRINSIC         INT, MAX, MIN
 C     .. Executable Statements ..
@@ -233,18 +216,20 @@ C
      $                MIN( P, N ) + MAX( 3*P - 1, NP, N+M ) )
          IF( LQUERY ) THEN
             IF( M.GT.0 ) THEN
-               NB = MIN( 64, ILAENV( 1, 'DORMQR', 'LT', P, N, MPM,
-     $                               -1 ) )
-               WRKOPT = MAX( JWORK, MPM + MAX( 1, N )*NB )
+               CALL DORMQR( 'Left', 'Transpose', P, N, MPM, ABCD,
+     $                      LDABCD, DWORK, ABCD, LDABCD, DWORK, -1,
+     $                      INFO )
+               WRKOPT = MAX( JWORK, MPM + INT( DWORK(1) ) )
             ELSE
                WRKOPT = JWORK
             END IF
-            NB = MIN( 64, ILAENV( 1, 'DORMRQ', 'RT', NP, N, MIN( P, N ),
-     $                            -1 ) )
-            WRKOPT = MAX( WRKOPT, MIN( P, N ) + MAX( 1, NP )*NB )
-            NB = MIN( 64, ILAENV( 1, 'DORMRQ', 'LN', N, M+N,
-     $                            MIN( P, N ), -1 ) )
-            WRKOPT = MAX( WRKOPT, MIN( P, N ) + MAX( 1, M+N )*NB )
+            CALL DORMRQ( 'Right', 'Transpose', NP, N, MIN( P, N ), ABCD,
+     $                   LDABCD, DWORK, ABCD, LDABCD, DWORK, -1, INFO )
+            WRKOPT = MAX( WRKOPT, MIN( P, N ) + INT( DWORK(1) ) )
+            CALL DORMRQ( 'Left', 'NoTranspose', N, M+N, MIN( P, N ),
+     $                   ABCD, LDABCD, DWORK, ABCD, LDABCD, DWORK, -1,
+     $                   INFO )
+            WRKOPT = MAX( WRKOPT, MIN( P, N ) + INT( DWORK(1) ) )
          ELSE IF( LDWORK.LT.JWORK ) THEN
             INFO = -18
          END IF
@@ -308,8 +293,7 @@ C           Workspace: need   M+N-1.
 C
             DO 40 I1 = 1, SIGMA
                CALL DLARFG( RO+1, ABCD(IROW,I1), ABCD(IROW+1,I1), 1, T )
-               CALL SLCT_DLATZM( 'L', RO+1, MNU-I1, ABCD(IROW+1,I1),
-     $                          1, T,
+               CALL DLATZM( 'L', RO+1, MNU-I1, ABCD(IROW+1,I1), 1, T,
      $                      ABCD(IROW,I1+1), ABCD(IROW+1,I1+1), LDABCD,
      $                      DWORK )
                IROW = IROW + 1
