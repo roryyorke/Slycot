@@ -321,7 +321,6 @@ function ab13bd(dico,jobn,n,m,p,a,lda,b,ldb,c,ldc,d,ldd,nq,tol,dwork,ldwork,iwar
     integer intent(hide),depend(n,m,p) :: ldwork = max(1,max(m*(n+m)+max(n*(n+5),max(m*(m+2),4*p)),n*(max(n,p)+4)+min(n,p)))
     integer intent(out) :: iwarn
     integer intent(out) :: info
-    double precision intent(out) :: ab13bd
 end function ab13bd
 subroutine ab13dd(dico,jobe,equil,jobd,n,m,p,fpeak,a,lda,e,lde,b,ldb,c,ldc,d,ldd,gpeak,tol,iwork,dwork,ldwork,cwork,lcwork,info) ! in AB13DD.f
     character intent(in) :: dico
