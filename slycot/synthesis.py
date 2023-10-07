@@ -2848,25 +2848,26 @@ def sb10fd(n,m,np,ncon,nmeas,gamma,A,B,C,D,tol=0.0,ldwork=None):
 def sb10md(f, order, nblock, itype, qutol, a, b, c, d, omega):
     """todo: docs"""
 
-    # todo: hidden. ugh.
     hidden = ' (hidden by the wrapper)'
-    arg_list = ('nc', 'mp', 'lendat', 'f',
-                'ord', 'mnb', 'nblock', 'itype', 'qutol', 'a', 'lda',
-                'b', 'ldb', 'c', 'ldc', 'd', 'ldd', 'omega', 'totord',
-                'ad', 'ldad', 'bd', 'ldbd', 'cd', 'ldcd', 'dd',
-                'lddd', 'mju', 'iwork', 'liwork', 'dwork', 'ldwork',
-                'zwork', 'lzwork', 'info')
+    # todo: hidden
+    arg_list = ('nc' + hidden, 'mp' + hidden, 'lendat' + hidden, 'f',
+                'ord', 'mnb' + hidden, 'nblock', 'itype', 'qutol',
+                'a', 'lda' + hidden, 'b', 'ldb' + hidden, 'c',
+                'ldc' + hidden, 'd', 'ldd' + hidden, 'omega', 'totord',
+                'ad', 'ldad', 'bd', 'ldbd', 'cd', 'ldcd', 'dd', 'lddd',
+                'mju', 'iwork' + hidden, 'liwork', 'dwork', 'ldwork',
+                'zwork' + hidden, 'lzwork', 'info')
 
     # todo: arg checks
-    #   - consistent size of order, nblock, itype
+    #   - consistent size & values of order, nblock, itype
     #   - consistent size of a,b,c,d
 
-    # todo: compute ldad, etc.
     nc = a.shape[0]
     mp = d.shape[1]
     lendat = len(omega)
     mnb = len(nblock)
 
+    # see SB10MD.f
     if qutol>0:
         ldad = max(1, mp*order)
         ldbd = max(1, mp*order)
@@ -2882,11 +2883,6 @@ def sb10md(f, order, nblock, itype, qutol, a, b, c, d, omega):
     ldwork = _sb10md_ldwork(nc, mp, lendat, order, mnb, qutol)
     lzwork = _sb10md_lzwork(nc, mp, lendat, order, mnb, qutol)
     
-    assert liwork > 0
-    assert ldwork > 0
-    assert lzwork > 0
-    print(f'{liwork=}, {ldwork=}, {lzwork=}, {ldad=}, {ldbd=}, {ldcd=}, {lddd=}')
-
     out = _wrapper.sb10md(f, order, nblock, itype, qutol,
                           a, b, c, d,
                           omega,
