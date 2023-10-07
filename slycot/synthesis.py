@@ -2843,3 +2843,89 @@ def sb10fd(n,m,np,ncon,nmeas,gamma,A,B,C,D,tol=0.0,ldwork=None):
     raise_if_slycot_error(out[-1], arg_list, sb10fd.__doc__)
 
     return out[:-1]
+
+
+def sb10md(f, order, nblock, itype, qutol, a, b, c, d, omega):
+    """todo: docs"""
+
+    # todo: hidden. ugh.
+    hidden = ' (hidden by the wrapper)'
+    arg_list = ('nc', 'mp', 'lendat', 'f',
+                'ord', 'mnb', 'nblock', 'itype', 'qutol', 'a', 'lda',
+                'b', 'ldb', 'c', 'ldc', 'd', 'ldd', 'omega', 'totord',
+                'ad', 'ldad', 'bd', 'ldbd', 'cd', 'ldcd', 'dd',
+                'lddd', 'mju', 'iwork', 'liwork', 'dwork', 'ldwork',
+                'zwork', 'lzwork', 'info')
+
+    # todo: arg checks
+    #   - consistent size of order, nblock, itype
+    #   - consistent size of a,b,c,d
+
+    # todo: compute ldad, etc.
+    nc = a.shape[0]
+    mp = d.shape[1]
+    lendat = len(omega)
+    mnb = len(nblock)
+
+    if qutol>0:
+        ldad = max(1, mp*order)
+        ldbd = max(1, mp*order)
+        ldcd = max(1, mp+f)
+        lddd = max(1, mp+f)
+        liwork = max(nc, 4*mnb-2, mp, 2*order+1)
+    else:
+        ldad = 1
+        ldbd = 1
+        ldcd = 1
+        lcdd = 1
+
+    ldwork = _sb10md_ldwork(nc, mp, lendat, order, mnb, qutol)
+    lzwork = _sb10md_lzwork(nc, mp, lendat, order, mnb, qutol)
+    
+    assert liwork > 0
+    assert ldwork > 0
+    assert lzwork > 0
+    print(f'{liwork=}, {ldwork=}, {lzwork=}, {ldad=}, {ldbd=}, {ldcd=}, {lddd=}')
+
+    out = _wrapper.sb10md(f, order, nblock, itype, qutol,
+                          a, b, c, d,
+                          omega,
+                          ldad, ldbd, ldcd, lddd,
+                          liwork, ldwork, lzwork)
+
+    # todo: check for errors
+    raise_if_slycot_error(out[-1], arg_list, sb10fd.__doc__)
+
+    return out[:-1]
+
+
+def _sb10md_ldwork(nc, mp, lendat, order, mnb, qutol, hnpts=2048):
+    # see SB10MD.f
+    lw4 = max(order*order + 5*order, 6*order + 1 + min(1, order))
+    mn  = min(2*lendat, 2*order + 1)
+    lw3 = (2*lendat*(2*order + 1) + max(2*lendat, 2*order + 1)
+           + max(mn + 6*order + 4, 2*mn + 1))
+    lw2 = lendat + 6*hnpts
+    lw1 = 2*lendat + 4*hnpts
+    lwb = lendat*(mp + 2) + order*(order + 2) + 1;
+    lwa = mp*lendat + 2*mnb + mp - 1
+    if qutol >= 0:
+        lwd = lwb + max( 2, lw1, lw2, lw3, lw4, 2*order )
+    else:
+        lwd = 0
+    lwm = (lwa + max(nc + max(nc, mp-1),
+                     2*mp*mp*mnb - mp*mp + 9*mnb*mnb
+                     + mp*mnb + 11*mp + 33*mnb - 11))
+    return max(3, lwm, lwd)
+
+
+def _sb10md_lzwork(nc, mp, lendat, order, mnb, qutol):
+    # see SB10MD.f
+    if qutol >= 0:
+        lzd = max(lendat*(2*order + 3), order*order + 3*order + 1 )
+    else:
+        lzd = 0
+
+    lzm = max(mp*mp + nc*mp + nc*nc + 2*nc,
+              6*mp*mp*mnb + 13*mp*mp + 6*mnb + 6*mp - 3)
+    return max(lzm, lzd)
