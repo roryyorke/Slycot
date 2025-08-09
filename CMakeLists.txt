@@ -1,39 +1,26 @@
-# CMake file for use in conjunction with scikit-build
+cmake_minimum_required(VERSION 3.17.2...3.29)
 
-cmake_minimum_required(VERSION 3.14.0)
+project(slycot LANGUAGES C Fortran)
 
-cmake_policy(SET CMP0074 NEW)
+find_package(
+  Python
+  COMPONENTS Interpreter Development.Module NumPy
+  REQUIRED)
 
-project(slycot LANGUAGES NONE)
-
-enable_language(C)
-enable_language(Fortran)
-
-find_package(Python COMPONENTS Interpreter Development NumPy REQUIRED)
-find_package(PythonExtensions REQUIRED)
-find_package(NumPy REQUIRED)
-find_package(F2PY REQUIRED)
-find_package(BLAS REQUIRED)
+# todo: do some platforms or lapack/blas combinations need
+# find_package(BLAS REQUIRED)?
 find_package(LAPACK REQUIRED)
 
-message(STATUS "Python headers included from: ${Python_INCLUDE_DIRS}")
-message(STATUS "NumPy headers included from: ${Python_NumPy_INCLUDE_DIRS}")
-message(STATUS "F2PY headers included from: ${F2PY_INCLUDE_DIRS}")
-message(STATUS "LAPACK: ${LAPACK_LIBRARIES}")
-message(STATUS "BLAS: ${BLAS_LIBRARIES}")
+# build f2py support contained in NumPy
+execute_process(
+  COMMAND "${PYTHON_EXECUTABLE}" -c
+          "import numpy.f2py; print(numpy.f2py.get_include())"
+  OUTPUT_VARIABLE F2PY_INCLUDE_DIR
+  OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-# https://github.com/python-control/Slycot/issues/193
-if((EXISTS "${Python_INCLUDE_DIRS}/numpy")
-    AND (NOT ("${Python_INCLUDE_DIRS}/numpy" EQUAL "${Python_NumPy_INCLUDE_DIRS}")))
-
-  message(FATAL_ERROR
-  "Python include directory has a numpy sub-directory,
-      ${Python_INCLUDE_DIRS}/numpy,
-  which is different from Numpy include directory
-    ${Python_NumPy_INCLUDE_DIRS}.
-  You're probably building in a virtual environment, in which case
-  uninstall numpy from the base environment and try again.")
-
-endif()
+add_library(fortranobject OBJECT "${F2PY_INCLUDE_DIR}/fortranobject.c")
+target_link_libraries(fortranobject PUBLIC Python::NumPy)
+target_include_directories(fortranobject PUBLIC "${F2PY_INCLUDE_DIR}")
+set_property(TARGET fortranobject PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 add_subdirectory(slycot)
