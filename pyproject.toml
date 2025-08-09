@@ -1,15 +1,10 @@
 [build-system]
-requires = [
-    "setuptools>=45",
-    "setuptools_scm>=8",
-    "wheel",
-    "scikit-build>=0.15",
-    "cmake>=3.14",
-    "numpy >= 1.23.1"]
-build-backend = "setuptools.build_meta"
+requires = ["scikit-build-core", "numpy"]
+build-backend = "scikit_build_core.build"
 
 [project]
 name = "slycot"
+version = "0.0.1" # not for release!
 description = "A wrapper for the SLICOT control and systems library"
 readme = "README.rst"
 authors = [{ name = "Enrico Avventi et al." }]
@@ -34,16 +29,15 @@ classifiers = [
 ]
 requires-python = ">=3.10"
 dependencies = [
-    "numpy >= 1.23.1",
+    "numpy",
 ]
-dynamic = ["version"]
+# dynamic = ["version"]
 
 [project.urls]
 homepage = "https://github.com/python-control/Slycot"
 
-
-[tool.setuptools_scm]
-write_to = "slycot/version.py"
+# [tool.setuptools_scm]
+# write_to = "slycot/version.py"
 
 [tool.pytest.ini_options]
 # run the tests with compiled and installed package
