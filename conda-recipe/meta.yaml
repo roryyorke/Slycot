@@ -13,18 +13,16 @@ requirements:
   build:
     - {{ compiler('fortran') }}
     - {{ compiler('c') }}
-    - cmake >=3.14
-    - make  # [linux]
+    - cmake >=3.15
+    - make                          # [not win]
   host:
     - libblas
     - libcblas
     - liblapack
     - python
     - numpy
-    - scikit-build >=0.15
+    - scikit-build-core
     - pip
-    - setuptools >=45
-    - setuptools_scm >=7
   run:
     - python {{ PY_VER }}
     - {{ pin_compatible('numpy') }}
