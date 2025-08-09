@@ -45,3 +45,9 @@ addopts = "--pyargs slycot"
 
 [tool.ruff.lint]
 ignore = [ "E741" ]
+
+[tool.scikit-build]
+ninja.version = ">=1.10"
+cmake.version = ">=3.17.2"
+# https://github.com/scikit-build/scikit-build-core/issues/1089
+cmake.args = ["-G Ninja"]
