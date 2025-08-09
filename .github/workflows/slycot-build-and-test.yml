@@ -15,7 +15,6 @@ jobs:
   build-conda:
     name: Build conda, ${{ matrix.os }}
     runs-on: ${{ matrix.os }}-latest
-    needs: build-sdist
     strategy:
         fail-fast: false
         matrix:
