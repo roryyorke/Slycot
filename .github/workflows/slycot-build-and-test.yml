@@ -19,6 +19,8 @@ jobs:
         fail-fast: false
         matrix:
           os:
+            - 'ubuntu'
+            - 'macos'
             - 'windows'
           python:
           # this is not the packaged version, just the version conda-build runs on.
