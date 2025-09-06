@@ -22,7 +22,8 @@ jobs:
             - 'windows'
           python:
           # this is not the packaged version, just the version conda-build runs on.
-            - '3.11'
+            - '3.10'
+            - '3.14'
 
     steps:
       - name: Checkout Slycot
