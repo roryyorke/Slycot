@@ -23,9 +23,8 @@ jobs:
             - 'macos'
             - 'windows'
           python:
-          # this is not the packaged version, just the version conda-build runs on.
             - '3.10'
-            - '3.14'
+            - '3.13'
 
     steps:
       - name: Checkout Slycot
@@ -43,4 +42,4 @@ jobs:
           channel-priority: strict
       - name: Conda build
         run: |
-          conda build conda-recipe
+          conda build conda-recipe --numpy 2 --python ${{ matrix.python }}
