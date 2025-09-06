@@ -36,7 +36,7 @@ jobs:
           python-version: ${{ matrix.python }}
           activate-environment: build-env
           miniforge-version: latest
-          conda-build-version: latest
+          conda-build-version: 25.7.0
           channel-priority: strict
       - name: Conda build
         run: |
