@@ -44,8 +44,7 @@ jobs:
         shell: bash -el {0}
         run: |
           set -e
-          # --quiet --verbose stops progress bars; see conda-build gh-14915
-          conda build --quiet --verbose conda-recipe --python ${{ matrix.python }}
+          conda build conda-recipe --python ${{ matrix.python }}
           # preserve directory structure for custom conda channel
           CONDA_ROOT=$(conda info --base)
           find "${CONDA_ROOT}/conda-bld" -maxdepth 2 -name 'slycot*.conda' | while read -r conda_pkg; do
@@ -135,22 +134,22 @@ jobs:
           set -e
           case ${{ matrix.blas_lib }} in
             unset        ) # the conda-forge default (os dependent)
-              conda install --quiet --verbose libblas libcblas liblapack
+              conda install libblas libcblas liblapack
               ;;
             Generic      )
-              conda install --quiet --verbose 'libblas=*=*netlib' 'libcblas=*=*netlib' 'liblapack=*=*netlib'
+              conda install 'libblas=*=*netlib' 'libcblas=*=*netlib' 'liblapack=*=*netlib'
               echo "libblas * *netlib" >> $CONDA_PREFIX/conda-meta/pinned
               ;;
             OpenBLAS     )
-              conda install --quiet --verbose 'libblas=*=*openblas' openblas
+              conda install 'libblas=*=*openblas' openblas
               echo "libblas * *openblas" >> $CONDA_PREFIX/conda-meta/pinned
               ;;
             Intel10_64lp )
-              conda install --quiet --verbose 'libblas=*=*mkl' mkl
+              conda install 'libblas=*=*mkl' mkl
               echo "libblas * *mkl" >> $CONDA_PREFIX/conda-meta/pinned
               ;;
           esac
-          conda install --quiet --verbose -c ./slycot-conda-pkgs slycot
+          conda install -c ./slycot-conda-pkgs slycot
           conda list
       - name: Slycot and python-control tests
         run: JOBNAME="$JOBNAME" bash -el slycot-src/.github/scripts/run-tests.sh
