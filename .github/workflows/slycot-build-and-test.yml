@@ -13,18 +13,17 @@ on:
 jobs:
 
   build-conda:
-    name: Build conda, ${{ matrix.os }}
+    name: Build conda, ${{ matrix.os }} ${{ matrix.python }}
     runs-on: ${{ matrix.os }}-latest
     strategy:
         fail-fast: false
         matrix:
           os:
             - 'ubuntu'
-            # - 'macos'
-            # - 'windows'
+            - 'macos'
+            - 'windows'
           python:
-            - '3.10'
-            # - '3.13'
+            - '3.13'
 
     steps:
       - name: Checkout Slycot
@@ -35,11 +34,13 @@ jobs:
       - name: Setup Conda
         uses: conda-incubator/setup-miniconda@v3
         with:
-          python-version: ${{ matrix.python }}
           activate-environment: build-env
-          miniforge-version: latest
-          conda-build-version: 25.7.0
           channel-priority: strict
+          channels: conda-forge
+          conda-build-version: 25.7.0
+          conda-remove-defaults: true
+          miniforge-version: latest
+          python-version: ${{ matrix.python }}
       - name: Conda build
         shell: bash -el {0}
         run: |
@@ -118,13 +119,13 @@ jobs:
       - name: Setup Conda
         uses: conda-incubator/setup-miniconda@v3
         with:
-          python-version: ${{ matrix.python }}
-          miniforge-version: latest
           activate-environment: test-env
-          environment-file: slycot-src/.github/conda-env/test-env.yml
-          channels: conda-forge,defaults
           channel-priority: strict
-          auto-activate-base: false
+          channels: conda-forge
+          conda-remove-defaults: true
+          environment-file: slycot-src/.github/conda-env/test-env.yml
+          miniforge-version: latest
+          python-version: ${{ matrix.python }}
       - name: Download conda packages
         uses: actions/download-artifact@v4
         with:
