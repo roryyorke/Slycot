@@ -52,7 +52,7 @@ jobs:
             mkdir -p "slycot-conda-pkgs/${conda_platform}"
             cp "${conda_pkg}" "slycot-conda-pkgs/${conda_platform}/"
           done
-          python -m conda_index ./slycot-conda-pkgs
+          conda index ./slycot-conda-pkgs
 
 
   create-conda-test-matrix:
