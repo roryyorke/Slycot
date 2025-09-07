@@ -53,6 +53,12 @@ jobs:
             cp "${conda_pkg}" "slycot-conda-pkgs/${conda_platform}/"
           done
           conda index ./slycot-conda-pkgs
+      - name: Save to local conda pkg channel
+        uses: actions/upload-artifact@v4
+        with:
+          name: slycot-conda-pkgs-${{ matrix.os }}-${{ matrix.python }}
+          path: slycot-conda-pkgs
+          retention-days: 5
 
 
   create-conda-test-matrix:
