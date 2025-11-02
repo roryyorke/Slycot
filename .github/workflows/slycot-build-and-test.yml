@@ -38,8 +38,6 @@ jobs:
           miniforge-version: latest
           conda-build-version: 25.7.0
           channel-priority: strict
-          channels: conda-forge
-          conda-remove-defaults: "true"
       - name: Conda build
         shell: bash -el {0}
         run: |
