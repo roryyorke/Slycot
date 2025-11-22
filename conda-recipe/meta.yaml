@@ -19,7 +19,7 @@ requirements:
     - {{ compiler('c') }}
     - {{ stdlib("c") }}
     - cmake >=3.14
-    - make  # [linux]
+    - ninja
   host:
     - libblas
     - libcblas
