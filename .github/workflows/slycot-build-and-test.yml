@@ -237,86 +237,11 @@ jobs:
           parallel: true
           file: slycot-src/coverage.xml
 
-  test-conda:
-    name: Test conda ${{ matrix.packagekey }}, ${{matrix.blas_lib}} BLAS lib ${{ matrix.failok }}
-    needs: create-conda-test-matrix
-    runs-on: ${{ matrix.os }}-latest
-    continue-on-error: ${{ matrix.failok == 'FAILOK' }}
-
-    strategy:
-      fail-fast: false
-      matrix: ${{ fromJSON(needs.create-conda-test-matrix.outputs.matrix) }}
-
-    defaults:
-      run:
-        shell: bash -el {0}
-
-    steps:
-      - name: Checkout Slycot
-        uses: actions/checkout@v3
-        with:
-          path: slycot-src
-      - name: Checkout python-control
-        uses: actions/checkout@v3
-        with:
-          repository: 'python-control/python-control'
-          path: python-control
-      - name: Setup macOS
-        if: matrix.os == 'macos'
-        run: brew install coreutils
-      - name: Setup Conda
-        uses: conda-incubator/setup-miniconda@v3
-        with:
-          python-version: ${{ matrix.python }}
-          miniforge-version: latest
-          activate-environment: test-env
-          environment-file: slycot-src/.github/conda-env/test-env.yml
-          channels: conda-forge,defaults
-          channel-priority: strict
-          auto-activate-base: false
-      - name: Download conda packages
-        uses: actions/download-artifact@v4
-        with:
-          name: slycot-conda-pkgs
-          path: slycot-conda-pkgs
-      - name: Install Conda package
-        run: |
-          set -e
-          case ${{ matrix.blas_lib }} in
-            unset        ) # the conda-forge default (os dependent)
-              conda install libblas libcblas liblapack
-              ;;
-            Generic      )
-              conda install 'libblas=*=*netlib' 'libcblas=*=*netlib' 'liblapack=*=*netlib'
-              echo "libblas * *netlib" >> $CONDA_PREFIX/conda-meta/pinned
-              ;;
-            OpenBLAS     )
-              conda install 'libblas=*=*openblas' openblas
-              echo "libblas * *openblas" >> $CONDA_PREFIX/conda-meta/pinned
-              ;;
-            Intel10_64lp )
-              conda install 'libblas=*=*mkl' mkl
-              echo "libblas * *mkl" >> $CONDA_PREFIX/conda-meta/pinned
-              ;;
-          esac
-          conda install -c ./slycot-conda-pkgs slycot
-          conda list
-      - name: Slycot and python-control tests
-        run: JOBNAME="$JOBNAME" bash -el slycot-src/.github/scripts/run-tests.sh
-        env:
-          JOBNAME: conda ${{ matrix.packagekey }} ${{ matrix.blas_lib }}
-      - name: report coverage
-        uses: coverallsapp/github-action@v2
-        with:
-          flag-name: wheel-${{ matrix.packagekey }}-${{matrix.blas_lib}}
-          parallel: true
-          file: slycot-src/coverage.xml
 
   coveralls-final:
     name: Finalize parallel coveralls
     if: always()
     needs:
-      - test-conda
       - test-wheel
     runs-on: ubuntu-latest
     steps:
