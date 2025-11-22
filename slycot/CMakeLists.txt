@@ -17,7 +17,7 @@ add_custom_command(
   OUTPUT _wrappermodule.c _wrapper-f2pywrappers.f
   DEPENDS ${F2PYSOURCE_DEPS} ${F2PYSOURCE}
   VERBATIM
-  COMMAND ${Python_EXECUTABLE} -m numpy.f2py ${CMAKE_CURRENT_SOURCE_DIR}/${F2PYSOURCE}
+  COMMAND ${Python_EXECUTABLE} -m numpy.f2py --skip-empty-wrappers ${CMAKE_CURRENT_SOURCE_DIR}/${F2PYSOURCE}
 )
 
 python_add_library(
