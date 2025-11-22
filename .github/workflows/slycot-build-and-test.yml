@@ -73,27 +73,13 @@ jobs:
         matrix:
             os:
               - 'ubuntu'
-              - 'macos'
             python:
-              - '3.10'
               - '3.12'
             bla_vendor: [ 'unset' ]
             include:
               - os: 'ubuntu'
                 python: '3.12'
                 bla_vendor: 'Generic'
-              - os: 'ubuntu'
-                python: '3.12'
-                bla_vendor: 'OpenBLAS'
-              - os: 'macos'
-                python: '3.12'
-                bla_vendor: 'Apple'
-              - os: 'macos'
-                python: '3.12'
-                bla_vendor: 'Generic'
-              - os: 'macos'
-                python: '3.12'
-                bla_vendor: 'OpenBLAS'
 
     steps:
       - name: Checkout Slycot
@@ -150,56 +136,6 @@ jobs:
           path: slycot-wheels
           retention-days: 5
 
-  build-conda:
-    name: Build conda, ${{ matrix.os }} ${{ matrix.python }}
-    runs-on: ${{ matrix.os }}-latest
-    needs: build-sdist
-    strategy:
-        fail-fast: false
-        matrix:
-          os:
-            - 'ubuntu'
-            - 'macos'
-            - 'windows'
-          python:
-            - '3.13'
-
-    steps:
-      - name: Checkout Slycot
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          submodules: 'recursive'
-      - name: Setup Conda
-        uses: conda-incubator/setup-miniconda@v3
-        with:
-          auto-update-conda: true
-          python-version: ${{ matrix.python }}
-          activate-environment: build-env
-          miniforge-version: latest
-          conda-build-version: 25.7.0
-          channel-priority: strict
-      - name: Conda build
-        shell: bash -el {0}
-        run: |
-          set -e
-          conda build conda-recipe --python ${{ matrix.python }}
-          # preserve directory structure for custom conda channel
-          CONDA_ROOT=$(conda info --base)
-          find "${CONDA_ROOT}/conda-bld" -maxdepth 2 -name 'slycot*.conda' | while read -r conda_pkg; do
-            conda_platform=$(basename $(dirname "${conda_pkg}"))
-            mkdir -p "slycot-conda-pkgs/${conda_platform}"
-            cp "${conda_pkg}" "slycot-conda-pkgs/${conda_platform}/"
-          done
-          conda index ./slycot-conda-pkgs
-      - name: Save to local conda pkg channel
-        uses: actions/upload-artifact@v4
-        with:
-          name: slycot-conda-pkgs-${{ matrix.os }}-${{ matrix.python }}
-          path: slycot-conda-pkgs
-          retention-days: 5
-
-
   create-wheel-test-matrix:
     name: Create wheel test matrix
     runs-on: ubuntu-latest
@@ -225,33 +161,6 @@ jobs:
           TEMPFILE="$(mktemp)"
           python3 .github/scripts/set-pip-test-matrix.py | tee $TEMPFILE
           echo "matrix=$(cat $TEMPFILE)" >> $GITHUB_OUTPUT
-
-  create-conda-test-matrix:
-    name: Create conda test matrix
-    runs-on: ubuntu-latest
-    needs: build-conda
-    if: always()  # run tests for all successful builds, even if others failed
-    outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
-    steps:
-      - name: Merge artifacts
-        uses: actions/upload-artifact/merge@v4
-        with:
-          name: slycot-conda-pkgs
-          pattern: slycot-conda-pkgs-*
-      - name: Checkout Slycot
-        uses: actions/checkout@v3
-      - name: Download conda packages
-        uses: actions/download-artifact@v4
-        with:
-          name: slycot-conda-pkgs
-          path: slycot-conda-pkgs
-      - id: set-matrix
-        run: |
-          TEMPFILE="$(mktemp)"
-          python3 .github/scripts/set-conda-test-matrix.py | tee $TEMPFILE
-          echo "matrix=$(cat $TEMPFILE)" >> $GITHUB_OUTPUT
-
 
   test-wheel:
     name: Test wheel ${{ matrix.packagekey }}, ${{matrix.blas_lib}} BLAS lib ${{ matrix.failok }}
@@ -402,7 +311,6 @@ jobs:
           flag-name: wheel-${{ matrix.packagekey }}-${{matrix.blas_lib}}
           parallel: true
           file: slycot-src/coverage.xml
-
 
   coveralls-final:
     name: Finalize parallel coveralls
