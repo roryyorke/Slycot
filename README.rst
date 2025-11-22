@@ -32,7 +32,7 @@ following dependencies:
 
 - Python 3.10+
 - NumPy
-- scikit-build
+- scikit-build-core
 - CMake
 - C compiler (e.g. gcc, MS Visual C++, clang)
 - FORTRAN compiler (e.g. gfortran, ifort, flang)
@@ -228,8 +228,8 @@ interpreter::
 
 Importing ``slycot`` or running ``pytest`` without ``--pyargs slycot`` from
 inside the source directory will fail, unless the compiled wrapper library has
-been installed into that directory. Note that the ``[tool:pytest]`` section
-in ``setup.cfg`` enforces the ``--pyargs slycot`` argument by default.
+been installed into that directory. Slycot's ``pyproject.toml`` section
+adds the ``--pyargs slycot`` argument to ``pytest`` by default.
 
 License
 -------
