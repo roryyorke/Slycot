@@ -1,9 +1,11 @@
 """Slycot is a Python interface to the SLICOT library"""
 
+from importlib.metadata import version, PackageNotFoundError
+
 try:
-    from ._version import __version__
-except ImportError as e:
-    raise RuntimeError('_version.py is generated at build-time') from e
+    __version__ = version('slycot')
+except PackageNotFoundError:
+    pass
 
 # The Slycot library is organised by 11-chapters. Each chapter can be identified by a single letter.
 # The following chapters are included:
