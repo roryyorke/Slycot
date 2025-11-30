@@ -29,7 +29,16 @@ jobs:
         with:
           fetch-depth: 0
           submodules: 'recursive'
+      - uses: fortran-lang/setup-fortran@v1
+        id: setup-fortran
+        with:
+          compiler: intel
+          version: 2025.0
+
       - name: install python-build
         run: pip install build
       - name: build
-        run: python -m build "--config-setting=cmake.args=-G Ninja" "--config-setting=cmake.args=-DCMAKE_C_COMPILER=clang" "--config-setting=cmake.args=-DCMAKE_Fortran_COMPILER=flang-new" .
+        run: |
+          ${{ steps.setup-fortran.outputs.fc }}
+          # ${{ steps.setup-fortran.outputs.cc }} # needed?
+          python -m build "--config-setting=cmake.args=-G Ninja"
