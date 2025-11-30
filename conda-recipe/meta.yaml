@@ -13,23 +13,18 @@ requirements:
   build:
     - python                                 # [build_platform != target_platform]
     - cross-python_{{ target_platform }}     # [build_platform != target_platform]
-    - numpy                                  # [build_platform != target_platform]
-    - scikit-build-core                      # [build_platform != target_platform]
     - {{ compiler('fortran') }}
     - {{ compiler('c') }}
     - {{ stdlib("c") }}
-    - cmake >=3.14
+    - cmake >=3.15
     - ninja
   host:
     - libblas
-    - libcblas
     - liblapack
-    - python
     - numpy
-    - scikit-build-core
     - pip
-    - setuptools >=45
-    - setuptools_scm >=7
+    - python
+    - scikit-build-core
   run:
     - python
 
