@@ -25,6 +25,7 @@ requirements:
     - pip
     - python
     - scikit-build-core
+    - setuptools_scm
   run:
     - python
 
