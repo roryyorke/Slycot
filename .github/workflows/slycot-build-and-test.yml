@@ -32,7 +32,7 @@ jobs:
       - uses: fortran-lang/setup-fortran@v1
         id: setup-fortran
         with:
-          compiler: intel
+          compiler: gfortran
           version: 'latest'
 
       - name: install python-build
