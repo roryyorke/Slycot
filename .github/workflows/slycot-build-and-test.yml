@@ -48,4 +48,4 @@ jobs:
         run: |
           ${{ steps.setup-fortran.outputs.fc }}
           # ${{ steps.setup-fortran.outputs.cc }} # needed?
-          python -m build "--config-setting=cmake.args=-G Ninja -DCMAKE_MODULE_PATH=/OpenBLAS-0.3.30/lib/cmake/openblas -DBLA_VENDOR=OpenBLAS"
+          python -m build "--config-setting=cmake.args=-G Ninja" "--config-setting=cmake.args=-DCMAKE_MODULE_PATH=/OpenBLAS-0.3.30/lib/cmake/openblas -DBLA_VENDOR=OpenBLAS"
