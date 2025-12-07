@@ -37,7 +37,7 @@ jobs:
 
       - name: Install OpenBLAS
         run: |
-          curl https://github.com/OpenMathLib/OpenBLAS/releases/download/v0.3.30/OpenBLAS-0.3.30-x64.zip --output OpenBLAS-0.3.30-x64.zip
+          curl.exe -v https://github.com/OpenMathLib/OpenBLAS/releases/download/v0.3.30/OpenBLAS-0.3.30-x64.zip --output OpenBLAS-0.3.30-x64.zip
           mkdir /OpenBLAS-0.3.30
           unzip OpenBLAS-0.3.30-x64.zip -d /OpenBLAS-0.3.30
 
