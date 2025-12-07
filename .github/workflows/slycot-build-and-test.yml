@@ -46,6 +46,4 @@ jobs:
         run: pip install build
       - name: build
         run: |
-          python -m build "--config-setting=cmake.args=-G Ninja"\
-              "--config-setting=cmake.args=-DCMAKE_MODULE_PATH=/OpenBLAS-0.3.30/lib/cmake/openblas"\
-              "-DBLA_VENDOR=OpenBLAS"
+          python -m build "--config-setting=cmake.args=-G Ninja" "--config-setting=cmake.args=-DCMAKE_MODULE_PATH=/OpenBLAS-0.3.30/lib/cmake/openblas" "-DBLA_VENDOR=OpenBLAS"
