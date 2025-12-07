@@ -13,8 +13,9 @@ find_package(LAPACK REQUIRED)
 
 # build f2py support contained in NumPy
 execute_process(
+  # CMake doesn't like "\" as path separator; TODO: ref
   COMMAND "${PYTHON_EXECUTABLE}" -c
-          "import numpy.f2py; print(numpy.f2py.get_include())"
+          "import numpy.f2py; print(numpy.f2py.get_include().replace('\\\\','/'))"
   OUTPUT_VARIABLE F2PY_INCLUDE_DIR
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 
