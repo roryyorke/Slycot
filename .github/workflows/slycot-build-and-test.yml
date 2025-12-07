@@ -35,10 +35,16 @@ jobs:
           compiler: gcc
           version: 'latest'
 
+      - name: Install OpenBLAS
+        run: |
+          curl https://github.com/OpenMathLib/OpenBLAS/releases/download/v0.3.30/OpenBLAS-0.3.30-x64.zip --output OpenBLAS-0.3.30-x64.zip
+          mkdir /OpenBLAS-0.3.30
+          unzip OpenBLAS-0.3.30-x64.zip -d /OpenBLAS-0.3.30
+
       - name: install python-build
         run: pip install build
       - name: build
         run: |
           ${{ steps.setup-fortran.outputs.fc }}
           # ${{ steps.setup-fortran.outputs.cc }} # needed?
-          python -m build "--config-setting=cmake.args=-G Ninja"
+          python -m build "--config-setting=cmake.args=-G Ninja -DCMAKE_MODULE_PATH=/OpenBLAS-0.3.30/lib/cmake/openblas -DBLA_VENDOR=OpenBLAS"
