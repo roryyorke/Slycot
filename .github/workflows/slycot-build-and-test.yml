@@ -27,8 +27,8 @@ jobs:
       - name: Install OpenBLAS
         run: |
           curl.exe --verbose --location https://github.com/OpenMathLib/OpenBLAS/releases/download/v0.3.30/OpenBLAS-0.3.30-x64.zip --output OpenBLAS-0.3.30-x64.zip
-          mkdir /OpenBLAS-0.3.30
-          unzip OpenBLAS-0.3.30-x64.zip -d /OpenBLAS-0.3.30
+          mkdir C:/OpenBLAS-0.3.30
+          unzip OpenBLAS-0.3.30-x64.zip -d C:/OpenBLAS-0.3.30
 
       - name: Checkout Slycot
         uses: actions/checkout@v3
@@ -46,4 +46,4 @@ jobs:
         run: pip install build
       - name: build
         run: |
-          python -m build "--config-setting=cmake.args=-G Ninja" "--config-setting=cmake.args=-DBLA_VENDOR=OpenBLAS" "--config-setting=cmake.args=-DBLAS_LIBRARIES=D:/OpenBLAS-0.3.30/lib/libopenblas.lib" "--config-setting=cmake.args=-DLAPACK_LIBRARIES=D:/OpenBLAS-0.3.30/lib/libopenblas.lib"
+          python -m build "--config-setting=cmake.args=-G Ninja" "--config-setting=cmake.args=-DBLA_VENDOR=OpenBLAS" "--config-setting=cmake.args=-DBLAS_LIBRARIES=C:/OpenBLAS-0.3.30/lib/libopenblas.lib" "--config-setting=cmake.args=-DLAPACK_LIBRARIES=C:/OpenBLAS-0.3.30/lib/libopenblas.lib"
