@@ -41,9 +41,14 @@ jobs:
           compiler: gcc
           version: 'latest'
 
-
       - name: install python-build
         run: pip install build
+
       - name: build
         run: |
-          python -m build "--config-setting=cmake.args=-G Ninja" "--config-setting=cmake.args=-DBLA_VENDOR=OpenBLAS" "--config-setting=cmake.args=-DBLAS_LIBRARIES=C:/OpenBLAS-0.3.30/lib/libopenblas.lib" "--config-setting=cmake.args=-DLAPACK_LIBRARIES=C:/OpenBLAS-0.3.30/lib/libopenblas.lib"
+          python -m build "--config-setting=cmake.args=-G Ninja" "--config-setting=cmake.args=-DBLA_VENDOR=OpenBLAS" "--config-setting=cmake.args=-DBLAS_LIBRARIES=C:/OpenBLAS-0.3.30/lib/libopenblas.lib" "--config-setting=cmake.args=-DLAPACK_LIBRARIES=C:/OpenBLAS-0.3.30/lib/libopenblas.lib" "--config-setting=cmake.args=-DBLA_STATIC=ON"
+
+      - name: Upload wheel
+        uses: actions/upload-artifact@v4
+        with:
+          path: dist/
