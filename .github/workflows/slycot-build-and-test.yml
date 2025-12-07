@@ -24,6 +24,12 @@ jobs:
             - '3.13'
 
     steps:
+      - name: Install OpenBLAS
+        run: |
+          curl.exe --verbose --location https://github.com/OpenMathLib/OpenBLAS/releases/download/v0.3.30/OpenBLAS-0.3.30-x64.zip --output OpenBLAS-0.3.30-x64.zip
+          mkdir /OpenBLAS-0.3.30
+          unzip OpenBLAS-0.3.30-x64.zip -d /OpenBLAS-0.3.30
+
       - name: Checkout Slycot
         uses: actions/checkout@v3
         with:
@@ -35,11 +41,6 @@ jobs:
           compiler: gcc
           version: 'latest'
 
-      - name: Install OpenBLAS
-        run: |
-          curl.exe -v https://github.com/OpenMathLib/OpenBLAS/releases/download/v0.3.30/OpenBLAS-0.3.30-x64.zip --output OpenBLAS-0.3.30-x64.zip
-          mkdir /OpenBLAS-0.3.30
-          unzip OpenBLAS-0.3.30-x64.zip -d /OpenBLAS-0.3.30
 
       - name: install python-build
         run: pip install build
