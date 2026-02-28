@@ -50,3 +50,21 @@ addopts = "--pyargs slycot"
 
 [tool.ruff.lint]
 ignore = [ "E741" ]
+
+[tool.cibuildwheel]
+test-requires = ['pytest', 'scipy']
+test-command = "pytest --pyargs slycot"
+
+[tool.cibuildwheel.linux]
+repair-wheel-command = [
+  "pip install scipy_openblas32",
+  "LD_LIBRARY_PATH=$(python -c \"import scipy_openblas32; import os.path; print(scipy_openblas32.get_lib_dir())\")",
+  "auditwheel repair -w {dest_dir} {wheel}",
+]
+
+[tool.cibuildwheel.windows]
+before-build = "pip install delvewheel"
+repair-wheel-command = [
+  "pip install scipy_openblas32",
+  "python tools/delvewheel_wrapper.py repair -w {dest_dir} {wheel}"
+]

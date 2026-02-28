@@ -1,0 +1,21 @@
+name: manylinux build
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: [ubuntu-latest]
+
+    steps:
+
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Build
+        run:  ./tools/manylinux-build.bash
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: manylinux
+          path: ./wheelhouse/*.whl
