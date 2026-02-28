@@ -7,9 +7,29 @@ find_package(
   COMPONENTS Interpreter Development.Module NumPy
   REQUIRED)
 
-# todo: do some platforms or lapack/blas combinations need
-# find_package(BLAS REQUIRED)?
-find_package(LAPACK REQUIRED)
+execute_process(
+  COMMAND "${PYTHON_EXECUTABLE}" -c
+          "import scipy_openblas32; import os.path; print(scipy_openblas32.get_lib_dir())"
+  OUTPUT_VARIABLE OPENBLAS_DIR
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+  COMMAND_ERROR_IS_FATAL ANY)
+
+cmake_path(CONVERT ${OPENBLAS_DIR} TO_CMAKE_PATH_LIST OPENBLAS_DIR)
+
+message(STATUS "OpenBlas directory: ${OPENBLAS_DIR}")
+
+execute_process(
+  COMMAND "${PYTHON_EXECUTABLE}" -c
+          "import scipy_openblas32; import os.path; print(scipy_openblas32.get_library(fullname=True))"
+  OUTPUT_VARIABLE OPENBLAS_LIBRARY_FILE
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+  COMMAND_ERROR_IS_FATAL ANY)
+
+message(STATUS "OpenBlas library file: ${OPENBLAS_LIBRARY_FILE}")
+
+cmake_path(APPEND OPENBLAS_DIR ${OPENBLAS_LIBRARY_FILE} OUTPUT_VARIABLE OPENBLAS_LIBRARY_FILE)
+
+message(STATUS "OpenBlas library file 2: ${OPENBLAS_LIBRARY_FILE}")
 
 # build f2py support contained in NumPy
 execute_process(

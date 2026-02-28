@@ -1,0 +1,74 @@
+* Building, attempt 1:
+
+  #+begin_example
+  /example/slycot/src/SLICOT-Reference/src/AB01MD.f:300:72:
+
+    300 |          CALL DGEHRD( N, 1, N, A, LDA, TAU(ITAU), DWORK, LDWORK, INFO )
+        |                                                                        1
+  Error: Syntax error in argument list at (1)
+  /example/slycot/src/SLICOT-Reference/src/AB01MD.f:311:72:
+
+    311 |      $         CALL DLACPY( 'L', N-2, N-2, A(3,1), LDA, Z(3,2), LDZ )
+        |                                                                        1
+  Error: Missing ‘)’ in statement at or before (1)
+  /example/slycot/src/SLICOT-Reference/src/AB01MD.f:317:72:
+
+    317 |                CALL DORGQR( N, N, N, Z, LDZ, TAU, DWORK, LDWORK, INFO )
+        |                                                                        1
+  #+end_example
+
+* attempt 2
+
+#+begin_example
+Traceback (most recent call last):
+  File "<frozen runpy>", line 189, in _run_module_as_main
+  File "<frozen runpy>", line 112, in _get_module_details
+  File "/tmp/tmp.DjTC8uCvFX/test/lib/python3.13/site-packages/slycot/__init__.py", line 25, in <module>
+    from .analysis import (ab01nd,
+    ...<6 lines>...
+                           ag08bd)
+  File "/tmp/tmp.DjTC8uCvFX/test/lib/python3.13/site-packages/slycot/analysis.py", line 22, in <module>
+    from . import _wrapper
+ImportError: /tmp/tmp.DjTC8uCvFX/test/lib/python3.13/site-packages/slycot/_wrapper.so: undefined symbol: dlamc3_
+
+Compilation exited abnormally with code 1 at Sat Feb 28 13:37:08, duration 0:01:47
+#+end_example
+
+dlamc3 appears nowhere in scipy
+
+
+* attempt 3
+
+#+begin_example
+Traceback (most recent call last):
+  File "<frozen runpy>", line 189, in _run_module_as_main
+  File "<frozen runpy>", line 112, in _get_module_details
+  File "/tmp/tmp.j8jUQhKRAD/test/lib/python3.13/site-packages/slycot/__init__.py", line 25, in <module>
+    from .analysis import (ab01nd,
+    ...<6 lines>...
+                           ag08bd)
+  File "/tmp/tmp.j8jUQhKRAD/test/lib/python3.13/site-packages/slycot/analysis.py", line 22, in <module>
+    from . import _wrapper
+ImportError: /tmp/tmp.j8jUQhKRAD/test/lib/python3.13/site-packages/slycot/_wrapper.so: undefined symbol: ilaenv_
+#+end_example
+
+ilaenv is in the ~lapack_exclusions~ list of _cython_signature_generator
+
+* attempt 4
+
+#+begin_example
+Traceback (most recent call last):
+  File "<frozen runpy>", line 189, in _run_module_as_main
+  File "<frozen runpy>", line 112, in _get_module_details
+  File "/tmp/tmp.t0UxXVRNUW/test/lib/python3.13/site-packages/slycot/__init__.py", line 25, in <module>
+    from .analysis import (ab01nd,
+    ...<6 lines>...
+                           ag08bd)
+  File "/tmp/tmp.t0UxXVRNUW/test/lib/python3.13/site-packages/slycot/analysis.py", line 22, in <module>
+    from . import _wrapper
+ImportError: /tmp/tmp.t0UxXVRNUW/test/lib/python3.13/site-packages/slycot/_wrapper.so: undefined symbol: xerbla_
+#+end_example
+
+hmm.  XERBLA is in the list of mapped symbols.... oh.  We provide our own.  I'm going to remove it from the list of mapped symbols and see what changes.  There's also XERBLA_ARRAY - what's that?...
+
+ok, that built!
