@@ -38,6 +38,8 @@ execute_process(
   OUTPUT_VARIABLE F2PY_INCLUDE_DIR
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 
+cmake_path(CONVERT ${F2PY_INCLUDE_DIR} TO_CMAKE_PATH_LIST F2PY_INCLUDE_DIR)
+
 add_library(fortranobject OBJECT "${F2PY_INCLUDE_DIR}/fortranobject.c")
 target_link_libraries(fortranobject PUBLIC Python::NumPy)
 target_include_directories(fortranobject PUBLIC "${F2PY_INCLUDE_DIR}")
