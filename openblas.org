@@ -1,3 +1,33 @@
+* problems and questions [3/4]
+
+** DONE fortran warnings
+see [[*tag cibuildwheel-1][tag cibuildwheel-1]]
+
+why does CMake use ~-fpreprocessed~ with f77 or fortran code in general?  Did it detect the ~-cpp~ or ~@~ ?   Why even ~-I~ and ~-J~ for the -fpreprocessed step?
+
+From f77ex: both -cpp and -fpreprocessed must be present for the warning to happen.  This is (obviously?) a nonsensical combination.
+
+ah, there are:
+
+  target_compile_definitions
+  COMPILE_LANGUAGE
+
+properties to better control this.
+
+** TODO objcopy
+
+is this feasible, easier, better?
+
+** DONE fortran vs C compile args
+
+cmake's COMPILE_LANGUAGE generator fixes this
+
+** DONE editable install
+
+half-works; need LD_LIBRARY_PATH pointing to site-packages/scipy_openblas32/lib.  I've got the ~BUILD_RPATH~ directive set; this was added in CMAke 3.8, I'm running 3.31.
+
+CMake target property INSTALL_RPATH fixes this
+
 * Building, attempt 1:
 
   #+begin_example
@@ -72,3 +102,370 @@ ImportError: /tmp/tmp.t0UxXVRNUW/test/lib/python3.13/site-packages/slycot/_wrapp
 hmm.  XERBLA is in the list of mapped symbols.... oh.  We provide our own.  I'm going to remove it from the list of mapped symbols and see what changes.  There's also XERBLA_ARRAY - what's that?...
 
 ok, that built!
+
+* tag cibuildwheel-1
+
+seems to work; cibuildwheel produces windows and linux wheels with openblas "vendored" in.
+
+** However, compile has many errors (warnings?)
+
+This ended up being due to ~-fpreprocessed~.  CMake generates two build commands, the first .f => .pp.f, the second .pp.f => .o.  The second has a ~-fpreprocessed~ argument (despite still having ~-cpp~ and ~-I~ 
+and so on).  ~-fpreprocessed~ generates warnings even on the raw .fortran code.
+
+#+begin_example
+/project/slycot/src/SLICOT-Reference/src/AB01MD.f:42:48:
+
+   42 | C             state dynamics matrix, given by Z' * A * Z, of a
+      |                                                1
+Warning: missing terminating ' character
+/project/slycot/src/SLICOT-Reference/src/AB01MD.f:52:67:
+
+   52 | C             canonical form of the input/state vector, given by Z' * B,
+      |                                                                   1
+Warning: missing terminating ' character
+[633/1257] Building Fortran object slycot/CMakeFiles/_wrapper.dir/src/SLICOT-Reference/src/AB01ND.f.o
+/project/slycot/src/SLICOT-Reference/src/AB01ND.f:66:25:
+
+   66 | C             given by Z' * A * Z, of a controllable realization for
+      |                         1
+Warning: missing terminating ' character
+/project/slycot/src/SLICOT-Reference/src/AB01ND.f:78:19:
+
+   78 | C             by Z' * B, with all elements but the first block set to
+      |                   1
+Warning: missing terminating ' character
+/project/slycot/src/SLICOT-Reference/src/AB01ND.f:357:39:
+
+  357 | C           and block column of A by Q' and Q, respectively.
+      |                                       1
+Warning: missing terminating ' character
+[634/1257] Building Fortran object slycot/CMakeFiles/_wrapper.dir/src/SLICOT-Reference/src/AB05PD.f.o
+[635/1257] Building Fortran object slycot/CMakeFiles/_wrapper.dir/src/SLICOT-Reference/src/AB05OD.f.o
+/project/slycot/src/SLICOT-Reference/src/AB05OD.f:167:9:
+
+  167 | C     X1'     = A1*X1 + B1*U
+      |         1
+Warning: missing terminating ' character
+/project/slycot/src/SLICOT-Reference/src/AB05OD.f:170:9:
+
+  170 | C     X2'     = A2*X2 + B2*V
+      |         1
+Warning: missing terminating ' character
+/project/slycot/src/SLICOT-Reference/src/AB05OD.f:173:15:
+
+  173 | C     (where  '  denotes differentiation with respect to time),
+      |               1
+Warning: missing terminating ' character
+/project/slycot/src/SLICOT-Reference/src/AB05OD.f:178:8:
+
+  178 | C     X'      = A*X + B*(U)
+      |        1
+Warning: missing terminating ' character
+[636/1257] Building Fortran object slycot/CMakeFiles/_wrapper.dir/src/SLICOT-Reference/src/AB05RD.f.o
+[637/1257] Building Fortran object slycot/CMakeFiles/_wrapper.dir/src/SLICOT-Reference/src/AB01OD.f.o
+/project/slycot/src/SLICOT-Reference/src/AB01OD.f:81:56:
+
+   81 | C             the transformed state transition matrix U' * A * U.
+      |                                                        1
+Warning: missing terminating ' character
+/project/slycot/src/SLICOT-Reference/src/AB01OD.f:83:62:
+
+   83 | C             Hessenberg state matrix Acont in Ac, given by U' * A * U,
+      |                                                              1
+Warning: missing terminating ' character
+/project/slycot/src/SLICOT-Reference/src/AB01OD.f:99:65:
+
+   99 | C             this array contains the transformed input matrix U' * B,
+      |                                                                 1
+Warning: missing terminating ' character
+/project/slycot/src/SLICOT-Reference/src/AB01OD.f:103:16:
+
+  103 | C             U' * B * V, with all elements but the first block set to
+      |                1
+Warning: missing terminating ' character
+/project/slycot/src/SLICOT-Reference/src/AB01OD.f:213:41:
+#+end_example
+
+I assume due to ~-ffixed-line-length-132~ argument.... no, if I include that arg it compiles fine.
+
+I can't reproduce this with ~gfortran -W -Wall -Wextra -c -ffixed-line-length-132 \@../slycot/scipy-openblas-symbols/scipy-openblas-symbols.def AB01OD.f -o /dev/null~ either
+
+How to get scikit-build-core to run in verbose mode? --config-settings skbuild.build.verbose=true
+
+#+begin_example
+/usr/bin/gfortran -I/home/roryy/src/slycot/slycot/src/SLICOT-Reference/src -I/tmp/pip-build-env-4e4nsu1t/overlay/lib/python3.13/site-packages/numpy/f2py/src -I/usr/include/python3.13 -I/tmp/pip-build-env-4e4nsu1t/overlay/lib/python3.13/site-packages/numpy/_core/include -O3 -Jslycot -fPIC -cpp @/home/roryy/src/slycot/slycot/scipy-openblas-symbols/scipy-openblas-symbols.def -ffixed-line-length-132 -fpreprocessed -c slycot/CMakeFiles/_wrapper.dir/src/SLICOT-Reference/src/AB01MD.f-pp.f -o slycot/CMakeFiles/_wrapper.dir/src/SLICOT-Reference/src/AB01MD.f.o
+#+end_example
+
+the compile command is quite something:
+
+  #+begin_src shell
+    /usr/bin/gfortran \
+        -cpp \
+        -D_wrapper_EXPORTS \
+        -I/tmp/pip-build-env-4e4nsu1t/overlay/lib/python3.13/site-packages/numpy/f2py/src \
+        -I/usr/include/python3.13 \
+        -I/tmp/pip-build-env-4e4nsu1t/overlay/lib/python3.13/site-packages/numpy/_core/include \
+        -O3 \
+        -Jslycot \
+        -fPIC \
+        -cpp \
+        @/home/roryy/src/slycot/slycot/scipy-openblas-symbols/scipy-openblas-symbols.def \
+        -ffixed-line-length-132 \
+        -E \
+        /home/roryy/src/slycot/slycot/src/SLICOT-Reference/src/AB01OD.f \
+        -o \
+        slycot/CMakeFiles/_wrapper.dir/src/SLICOT-Reference/src/AB01OD.f-pp.f
+
+
+    && \
+    /usr/bin/cmake \
+    -E \
+    cmake_ninja_depends \
+    --tdi=slycot/CMakeFiles/_wrapper.dir/FortranDependInfo.json \
+    --lang=Fortran \
+    --src=slycot/CMakeFiles/_wrapper.dir/src/SLICOT-Reference/src/AB01OD.f-pp.f \
+    --out=slycot/CMakeFiles/_wrapper.dir/src/SLICOT-Reference/src/AB01OD.f-pp.f \
+    --dep=slycot/CMakeFiles/_wrapper.dir/src/SLICOT-Reference/src/AB01OD.f-pp.f.d \
+    --obj=slycot/CMakeFiles/_wrapper.dir/src/SLICOT-Reference/src/AB01OD.f.o \
+    --ddi=slycot/CMakeFiles/_wrapper.dir/src/SLICOT-Reference/src/AB01OD.f.o.ddi \
+    --src-orig=/home/roryy/src/slycot/slycot/src/SLICOT-Reference/src/AB01OD.f
+  #+end_src
+
+then
+
+  #+begin_src shell
+    /usr/bin/gfortran \
+    -I/home/roryy/src/slycot/slycot/src/SLICOT-Reference/src \
+    -I/tmp/pip-build-env-4e4nsu1t/overlay/lib/python3.13/site-packages/numpy/f2py/src \
+    -I/usr/include/python3.13 \
+    -I/tmp/pip-build-env-4e4nsu1t/overlay/lib/python3.13/site-packages/numpy/_core/include \
+    -O3 \
+    -Jslycot \
+    -fPIC \
+    -cpp \
+    @/home/roryy/src/slycot/slycot/scipy-openblas-symbols/scipy-openblas-symbols.def \
+    -ffixed-line-length-132 \
+    -fpreprocessed \
+    -c \
+    slycot/CMakeFiles/_wrapper.dir/src/SLICOT-Reference/src/AB01OD.f-pp.f \
+    -o \
+    slycot/CMakeFiles/_wrapper.dir/src/SLICOT-Reference/src/AB01OD.f.o \
+     \
+     \
+     \
+
+  #+end_src
+
+
+* lapack/blas symbols used
+
+                 #+begin_example
+                 U scipy_dasum_
+                 U scipy_daxpy_
+                 U scipy_dbdsqr_
+                 U scipy_dcopy_
+                 U scipy_ddot_
+                 U scipy_dgebak_
+                 U scipy_dgebal_
+                 U scipy_dgebrd_
+                 U scipy_dgecon_
+                 U scipy_dgeequ_
+                 U scipy_dgees_
+                 U scipy_dgeev_
+                 U scipy_dgehrd_
+                 U scipy_dgelq2_
+                 U scipy_dgelqf_
+                 U scipy_dgels_
+                 U scipy_dgelss_
+                 U scipy_dgelsy_
+                 U scipy_dgemm_
+                 U scipy_dgemv_
+                 U scipy_dgeqlf_
+                 U scipy_dgeqp3_
+                 U scipy_dgeqr2_
+                 U scipy_dgeqrf_
+                 U scipy_dger_
+                 U scipy_dgerfs_
+                 U scipy_dgerq2_
+                 U scipy_dgerqf_
+                 U scipy_dgesc2_
+                 U scipy_dgesv_
+                 U scipy_dgesvd_
+                 U scipy_dgesvx_
+                 U scipy_dgetc2_
+                 U scipy_dgetrf_
+                 U scipy_dgetri_
+                 U scipy_dgetrs_
+                 U scipy_dggbak_
+                 U scipy_dggbal_
+                 U scipy_dgges_
+                 U scipy_dggev_
+                 U scipy_dhgeqz_
+                 U scipy_dhseqr_
+                 U scipy_dlabad_
+                 U scipy_dlacn2_
+                 U scipy_dlacpy_
+                 U scipy_dladiv_
+                 U scipy_dlaexc_
+                 U scipy_dlag2_
+                 U scipy_dlagv2_
+                 U scipy_dlahqr_
+                 U scipy_dlaic1_
+                 U scipy_dlaln2_
+                 U scipy_dlamc3_
+                 U scipy_dlamch_
+                 U scipy_dlange_
+                 U scipy_dlanhs_
+                 U scipy_dlansy_
+                 U scipy_dlantr_
+                 U scipy_dlanv2_
+                 U scipy_dlapmt_
+                 U scipy_dlapy2_
+                 U scipy_dlapy3_
+                 U scipy_dlaqge_
+                 U scipy_dlarf_
+                 U scipy_dlarfb_
+                 U scipy_dlarfg_
+                 U scipy_dlarft_
+                 U scipy_dlarfx_
+                 U scipy_dlarnv_
+                 U scipy_dlartg_
+                 U scipy_dlas2_
+                 U scipy_dlascl_
+                 U scipy_dlaset_
+                 U scipy_dlasr_
+                 U scipy_dlasrt_
+                 U scipy_dlassq_
+                 U scipy_dlasv2_
+                 U scipy_dlasy2_
+                 U scipy_dlatrs_
+                 U scipy_dnrm2_
+                 U scipy_dorg2r_
+                 U scipy_dorgbr_
+                 U scipy_dorghr_
+                 U scipy_dorgqr_
+                 U scipy_dorgr2_
+                 U scipy_dorgrq_
+                 U scipy_dorm2r_
+                 U scipy_dormbr_
+                 U scipy_dormhr_
+                 U scipy_dormlq_
+                 U scipy_dormql_
+                 U scipy_dormqr_
+                 U scipy_dormr2_
+                 U scipy_dormrq_
+                 U scipy_dormrz_
+                 U scipy_dpocon_
+                 U scipy_dposv_
+                 U scipy_dpotrf_
+                 U scipy_dpotrs_
+                 U scipy_dpptrf_
+                 U scipy_dpptri_
+                 U scipy_dpptrs_
+                 U scipy_dpttrf_
+                 U scipy_dpttrs_
+                 U scipy_drot_
+                 U scipy_drotg_
+                 U scipy_drscl_
+                 U scipy_dscal_
+                 U scipy_dspmv_
+                 U scipy_dspr_
+                 U scipy_dswap_
+                 U scipy_dsycon_
+                 U scipy_dsyev_
+                 U scipy_dsyevx_
+                 U scipy_dsymm_
+                 U scipy_dsymv_
+                 U scipy_dsyr2_
+                 U scipy_dsyr2k_
+                 U scipy_dsyrk_
+                 U scipy_dsysv_
+                 U scipy_dsytrf_
+                 U scipy_dsytri_
+                 U scipy_dsytrs_
+                 U scipy_dtgex2_
+                 U scipy_dtgexc_
+                 U scipy_dtgsen_
+                 U scipy_dtgsyl_
+                 U scipy_dtpmv_
+                 U scipy_dtrcon_
+                 U scipy_dtrevc_
+                 U scipy_dtrexc_
+                 U scipy_dtrmm_
+                 U scipy_dtrmv_
+                 U scipy_dtrsen_
+                 U scipy_dtrsm_
+                 U scipy_dtrsv_
+                 U scipy_dtrsyl_
+                 U scipy_dtrtri_
+                 U scipy_dtrtrs_
+                 U scipy_dtzrzf_
+                 U scipy_dzasum_
+                 U scipy_dznrm2_
+                 U scipy_idamax_
+                 U scipy_ilaenv_
+                 U scipy_izamax_
+                 U scipy_lsame_
+                 U scipy_zaxpy_
+                 U scipy_zcopy_
+                 U scipy_zdotu_
+                 U scipy_zdrscl_
+                 U scipy_zdscal_
+                 U scipy_zgecon_
+                 U scipy_zgees_
+                 U scipy_zgemm_
+                 U scipy_zgemv_
+                 U scipy_zgeqp3_
+                 U scipy_zgeqrf_
+                 U scipy_zgerc_
+                 U scipy_zgerqf_
+                 U scipy_zgeru_
+                 U scipy_zgesc2_
+                 U scipy_zgesv_
+                 U scipy_zgesvd_
+                 U scipy_zgetc2_
+                 U scipy_zgetrf_
+                 U scipy_zgetri_
+                 U scipy_zgetrs_
+                 U scipy_zgges_
+                 U scipy_zhgeqz_
+                 U scipy_zlacgv_
+                 U scipy_zlacon_
+                 U scipy_zlacp2_
+                 U scipy_zlacpy_
+                 U scipy_zladiv_
+                 U scipy_zlahqr_
+                 U scipy_zlaic1_
+                 U scipy_zlange_
+                 U scipy_zlanhs_
+                 U scipy_zlantr_
+                 U scipy_zlapmt_
+                 U scipy_zlarf_
+                 U scipy_zlarfg_
+                 U scipy_zlarnv_
+                 U scipy_zlartg_
+                 U scipy_zlascl_
+                 U scipy_zlaset_
+                 U scipy_zlassq_
+                 U scipy_zlatrs_
+                 U scipy_zrot_
+                 U scipy_zscal_
+                 U scipy_zstein_
+                 U scipy_zswap_
+                 U scipy_ztgexc_
+                 U scipy_ztrexc_
+                 U scipy_ztrmm_
+                 U scipy_ztrmv_
+                 U scipy_ztrsm_
+                 U scipy_ztzrzf_
+                 U scipy_zungqr_
+                 U scipy_zunmqr_
+                 U scipy_zunmrq_
+                 U scipy_zunmrz_
+                 #+end_example
+
+
+
+* objcopy
+
+objcopy 
