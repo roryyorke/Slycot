@@ -10,7 +10,9 @@ lapack_exclusions = [
               # in the ABI wrappers
               'slaneg',
               # Excluded because they require Fortran string arguments.
-              'ilaenv', 'iparmq', 'lsamen', 'xerbla',
+              'ilaenv', 'iparmq', 'lsamen',
+              # slycot: we have our own xerbla
+              # 'xerbla',
               # Exclude XBLAS routines since they aren't included
               # by default.
               'cgesvxx', 'dgesvxx', 'sgesvxx', 'zgesvxx',

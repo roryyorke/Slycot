@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.17.2...3.29)
 
 project(slycot LANGUAGES C Fortran)
 
+find_program(SLYCOT_OBJCOPY objcopy)
+
 find_package(
   Python
   COMPONENTS Interpreter Development.Module NumPy

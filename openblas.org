@@ -18,6 +18,11 @@ properties to better control this.
 
 is this feasible, easier, better?
 
+ - assemble fortran code, *including own xerbla*, into a static library
+ - applies ~objcopy --redefine-syms~ in post-build step with add_custom_command
+
+cibuildwheel passed locally, let's see if we have any luck on windows
+
 ** DONE fortran vs C compile args
 
 cmake's COMPILE_LANGUAGE generator fixes this

@@ -50,15 +50,45 @@ def get_symbols(filename):
     return [s for s in symbols if s is not None]
 
 
+def find_intersections(data):
+    from itertools import combinations
+    for p1, p2 in combinations(data, 2):
+        s1 = set(data[p1])
+        if not len(s1) == len(data[p1]):
+            raise ValueError(f'{p1} has duplicates: ')
+        s2 = set(data[p2])
+        if not len(s2) == len(data[p2]):
+            raise ValueError(f'{p2} has duplicates')
+
+        if s1.issubset(s2):
+            raise ValueError(f'{p1} is a subset of {p2}')
+            
+        if s2.issubset(s1):
+            raise ValueError(f'{p2} is a subset of {p1}')
+
+        both = s1.intersection(s2)
+
+        if both:
+            raise ValueError(f'{p1} and {p2} have non-empty intersection: {both}')
+
+
 def main():
     """Get symbols and create output file"""
     blas = get_symbols('cython_blas_signatures.txt')
     lapack = get_symbols('cython_lapack_signatures.txt')
-    manual = get_symbols('manual_wrappers.txt')
+
+    find_intersections({'blas': blas,
+                        'lapack': lapack,
+                        'lapack_exclusions': lapack_exclusions,
+                        'own_symbols': own_symbols})
 
     with open('scipy-openblas-symbols.def', 'wt') as outfile:
-        for symbol in blas + lapack + manual + own_symbols + lapack_exclusions:
+        for symbol in blas + lapack + own_symbols + lapack_exclusions:
             outfile.write(f'-D{symbol.upper()}=SCIPY_{symbol.upper()}\n')
+
+    with open('objcopy-remap.txt', 'wt') as outfile:
+        for symbol in sorted(blas + lapack + own_symbols + lapack_exclusions):
+            outfile.write(f'{symbol.lower()}_ scipy_{symbol.lower()}_\n')
 
 
 if __name__ == '__main__':
