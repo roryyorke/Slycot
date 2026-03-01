@@ -29,7 +29,7 @@ python_add_library(
 
 target_compile_options(_wrapper PRIVATE -cpp "@${CMAKE_CURRENT_SOURCE_DIR}/scipy-openblas-symbols/scipy-openblas-symbols.def" -ffixed-line-length-132)
 target_link_libraries(_wrapper PUBLIC ${OPENBLAS_LIBRARY_FILE})
-set_target_properties(_wrapper PROPERTIES BUILD_RPATH ${OPENBLAS_DIR})
+set_target_properties(_wrapper PROPERTIES INSTALL_RPATH ${OPENBLAS_DIR})
 
 target_link_libraries(_wrapper PRIVATE fortranobject)
 install(TARGETS _wrapper DESTINATION slycot)
