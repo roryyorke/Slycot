@@ -11,6 +11,7 @@ jobs:
         os: [ubuntu-latest, windows-latest] # , macos-14
     env:
       CIBW_BUILD: "cp313-win_amd64 cp313-manylinux_x86_64" # cp313-macosx_arm64
+      CIBW_ENVIRONMENT: "CMAKE_ARGS='-DSLYCOT_BUNDLE_OPENBLAS=ON'"
 
     steps:
 
@@ -30,6 +31,7 @@ jobs:
       - name: windows-config
         if: startsWith(matrix.os, 'windows')
         # TODO: equivalent of command -v for gcc, gfortran
+        # why does CMake find objcopy but not gfortran?  try just "gfortran".
         run: |
           echo SKBUILD_CMAKE_ARGS="-G Ninja;-DCMAKE_Fortran_COMPILER=c:/mingw64/bin/gfortran.exe;-DCMAKE_C_COMPILER=c:/mingw64/bin/gcc.exe" >> $env:GITHUB_ENV
 
