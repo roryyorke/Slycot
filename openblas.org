@@ -1,4 +1,4 @@
-* problems and questions [3/4]
+* problems and questions [4/4]
 
 ** DONE fortran warnings
 see [[*tag cibuildwheel-1][tag cibuildwheel-1]]
@@ -14,7 +14,7 @@ ah, there are:
 
 properties to better control this.
 
-** TODO objcopy
+** DONE objcopy
 
 is this feasible, easier, better?
 
@@ -32,6 +32,17 @@ cmake's COMPILE_LANGUAGE generator fixes this
 half-works; need LD_LIBRARY_PATH pointing to site-packages/scipy_openblas32/lib.  I've got the ~BUILD_RPATH~ directive set; this was added in CMAke 3.8, I'm running 3.31.
 
 CMake target property INSTALL_RPATH fixes this
+
+** TODO delocate
+
+scipy does something tricky:
+# Use the libgfortran from gfortran rather than the one in the wheel
+# since delocate gets confused if there is more than one
+# https://github.com/scipy/scipy/issues/20852
+install_name_tool -change @loader_path/../.dylibs/libgfortran.5.dylib @rpath/libgfortran.5.dylib $lib_loc/libsci*
+install_name_tool -change @loader_path/../.dylibs/libgcc_s.1.1.dylib @rpath/libgcc_s.1.1.dylib $lib_loc/libsci*
+install_name_tool -change @loader_path/../.dylibs/libquadmath.0.dylib @rpath/libquadmath.0.dylib $lib_loc/libsci*
+
 
 * Building, attempt 1:
 
@@ -474,3 +485,5 @@ then
 * objcopy
 
 objcopy 
+
+* 
