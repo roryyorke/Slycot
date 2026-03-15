@@ -18,7 +18,7 @@ execute_process(
 cmake_path(CONVERT ${F2PY_INCLUDE_DIR} TO_CMAKE_PATH_LIST F2PY_INCLUDE_DIR)
 
 if(SLYCOT_BUNDLE_OPENBLAS)
-  find_program(SLYCOT_OBJCOPY objcopy)
+  find_program(SLYCOT_OBJCOPY objcopy REQUIRED)
 
   execute_process(
     COMMAND "${PYTHON_EXECUTABLE}" -c
