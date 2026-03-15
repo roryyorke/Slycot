@@ -6,9 +6,9 @@ brew install binutils
 
 brew list binutils
 
-brew list binutils|grep "/objcopy$"
+brew list binutils|grep "/objcopy$"|head -1
 
-objcopy_bin=$(brew list binutils|grep "/objcopy$")
+objcopy_bin=$(brew list binutils|grep "/objcopy$"|head -1)
 
 gfortran_bin=$(command -v gfortran-13)
 gcc_bin=$(command -v gcc-13)
