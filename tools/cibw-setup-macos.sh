@@ -3,6 +3,11 @@
 set -ex
 
 brew install binutils
+
+brew list binutils
+
+brew list binutils|grep "objcopy$"
+
 objcopy_bin=$(brew list binutils|grep "objcopy$")
 
 gfortran_bin=$(command -v gfortran-13)
