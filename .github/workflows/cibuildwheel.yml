@@ -12,6 +12,7 @@ jobs:
     env:
       CIBW_BUILD: "cp313-win_amd64 cp313-manylinux_x86_64 cp313-macosx_arm64"
       CIBW_ENVIRONMENT: "CMAKE_ARGS='-DSLYCOT_BUNDLE_OPENBLAS=ON'"
+      SKBUILD_BUILD_VERBOSE: true
 
     steps:
 
