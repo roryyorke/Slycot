@@ -68,3 +68,6 @@ repair-wheel-command = [
   "pip install scipy_openblas32",
   "python tools/delvewheel_wrapper.py repair -w {dest_dir} {wheel}"
 ]
+
+[tool.cibuildwheel.macos]
+repair-wheel-command = "bash {project}/tools/cibw_repair_wheel_macos.sh {dest_dir} {wheel}"
