@@ -2,6 +2,12 @@
 
 set -ex
 
+brew list binutils
+
+brew list binutils|grep objcopy
+
+exit 1
+
 gfortran_bin=$(command -v gfortran-13)
 gcc_bin=$(command -v gcc-13)
 
