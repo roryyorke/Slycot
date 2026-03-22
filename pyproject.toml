@@ -65,7 +65,7 @@ repair-wheel-command = [
 
 [tool.cibuildwheel.windows]
 repair-wheel-command = [
-  "pip install delvewheel"
+  "pip install delvewheel",
   "python tools/delvewheel_wrapper.py repair --add-path build-libs -w {dest_dir} {wheel}"
 ]
 
