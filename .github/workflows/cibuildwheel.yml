@@ -12,8 +12,8 @@ jobs:
     env:
       CIBW_BUILD: "cp313-win32"
       CIBW_ENVIRONMENT: "CMAKE_ARGS='-DSLYCOT_BUNDLE_OPENBLAS=ON'"
-      CFLAGS=-m32
-      FFLAGS=-m32
+      CFLAGS: -m32
+      FFLAGS: -m32
       SKBUILD_BUILD_VERBOSE: true
 
     steps:
