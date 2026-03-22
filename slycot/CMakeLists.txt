@@ -6,12 +6,11 @@ set(SLYCOT_FSOURCE src/ftruefalse.f src/XERBLA.f)
 
 add_library(slicot STATIC ${SLICOT_FSOURCE} ${SLYCOT_FSOURCE})
 set_property(TARGET slicot PROPERTY POSITION_INDEPENDENT_CODE ON)
-
 if(SLYCOT_BUNDLE_OPENBLAS)
-  add_custom_command(TARGET slicot
-    POST_BUILD
-    # map symbols
-    COMMAND ${SLYCOT_OBJCOPY} --redefine-syms=${CMAKE_CURRENT_SOURCE_DIR}/scipy-openblas-symbols/objcopy-remap.txt $<TARGET_FILE:slicot> $<TARGET_FILE:slicot>)
+  target_compile_options(slicot
+    PRIVATE
+    @${CMAKE_CURRENT_SOURCE_DIR}/scipy-openblas-symbols/scipy-openblas-symbols.def
+    -ffixed-line-length-132)
 endif()
 
 # f2py definitions
