@@ -43,8 +43,6 @@ jobs:
       - name: windows-config
         if: startsWith(matrix.os, 'windows')
         run: |
-          dir c:\msys64
-          dir c:\msys64\mingw32
           dir c:\msys64\mingw32\bin
 
       # - name: windows-config
