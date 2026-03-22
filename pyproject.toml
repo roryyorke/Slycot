@@ -1,5 +1,5 @@
 [build-system]
-requires = ["scikit-build-core", "numpy", "scipy_openblas32"]
+requires = ["scikit-build-core", "numpy"]
 build-backend = "scikit_build_core.build"
 
 [project]
@@ -52,21 +52,21 @@ addopts = "--pyargs slycot"
 ignore = [ "E741" ]
 
 [tool.cibuildwheel]
+before-build = "python tools/cibw_before_build.py 0.3.31.22.1"
 test-requires = ['pytest', 'scipy']
 test-command = "pytest --pyargs slycot"
 
 [tool.cibuildwheel.linux]
 repair-wheel-command = [
   "pip install scipy_openblas32",
-  "LD_LIBRARY_PATH=$(python -c \"import scipy_openblas32; import os.path; print(scipy_openblas32.get_lib_dir())\")",
+  "LD_LIBRARY_PATH=./build-libs",
   "auditwheel repair -w {dest_dir} {wheel}",
 ]
 
 [tool.cibuildwheel.windows]
-before-build = "pip install delvewheel"
 repair-wheel-command = [
-  "pip install scipy_openblas32",
-  "python tools/delvewheel_wrapper.py repair -w {dest_dir} {wheel}"
+  "pip install delvewheel"
+  "python tools/delvewheel_wrapper.py repair --add-path build-libs -w {dest_dir} {wheel}"
 ]
 
 [tool.cibuildwheel.macos]

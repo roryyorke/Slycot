@@ -18,23 +18,14 @@ execute_process(
 cmake_path(CONVERT ${F2PY_INCLUDE_DIR} TO_CMAKE_PATH_LIST F2PY_INCLUDE_DIR)
 
 if(SLYCOT_BUNDLE_OPENBLAS)
-  execute_process(
-    COMMAND "${PYTHON_EXECUTABLE}" -c
-    "import scipy_openblas32; import os.path; print(scipy_openblas32.get_lib_dir())"
-    OUTPUT_VARIABLE OPENBLAS_DIR
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-    COMMAND_ERROR_IS_FATAL ANY)
+  set(OPENBLAS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/build-libs")
 
-  cmake_path(CONVERT ${OPENBLAS_DIR} TO_CMAKE_PATH_LIST OPENBLAS_DIR)
-
-  execute_process(
-    COMMAND "${PYTHON_EXECUTABLE}" -c
-    "import scipy_openblas32; import os.path; print(scipy_openblas32.get_library(fullname=True))"
-    OUTPUT_VARIABLE OPENBLAS_LIBRARY_FILE
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-    COMMAND_ERROR_IS_FATAL ANY)
-
-  cmake_path(APPEND OPENBLAS_DIR ${OPENBLAS_LIBRARY_FILE} OUTPUT_VARIABLE OPENBLAS_LIBRARY_FILE)
+  find_library(
+    OPENBLAS_LIBRARY_FILE
+    NAMES libscipy_openblas.so libscipy_openblas.dll
+    PATHS ${OPENBLAS_DIR}
+    NO_DEFAULT_PATH
+    REQUIRED)
 else()
   find_package(LAPACK REQUIRED)
 endif()
