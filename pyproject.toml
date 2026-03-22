@@ -58,7 +58,6 @@ test-command = "pytest --pyargs slycot"
 
 [tool.cibuildwheel.linux]
 repair-wheel-command = [
-  "pip install scipy_openblas32",
   "LD_LIBRARY_PATH=./build-libs",
   "auditwheel repair -w {dest_dir} {wheel}",
 ]
@@ -66,7 +65,7 @@ repair-wheel-command = [
 [tool.cibuildwheel.windows]
 repair-wheel-command = [
   "pip install delvewheel",
-  "python tools/delvewheel_wrapper.py repair --add-path build-libs -w {dest_dir} {wheel}"
+  "delvewheel repair --add-path build-libs -w {dest_dir} {wheel}"
 ]
 
 [tool.cibuildwheel.macos]

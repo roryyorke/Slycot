@@ -22,5 +22,4 @@ fi
 
 export DYLD_LIBRARY_PATH=$lib_loc:$gfortran_libs
 
-delocate-listdeps $wheel
 delocate-wheel -w $dest_dir $wheel
