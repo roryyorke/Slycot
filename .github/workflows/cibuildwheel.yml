@@ -15,8 +15,9 @@ jobs:
       - name: windows-config
         if: startsWith(matrix.os, 'windows')
         run: |
-          dir c:\msys64\mingw64\bin
-          c:\msys64\mingw32\bin\i686-w64-mingw32-gcc.exe -v --version
+          dir c:\msys64\mingw32\bin\g*.exe
+          c:\msys64\mingw32\bin\gcc.exe -v --version
+          c:\msys64\mingw32\bin\gfortran.exe -v --version
 
       # - name: windows-config
       #   if: startsWith(matrix.os, 'windows')
