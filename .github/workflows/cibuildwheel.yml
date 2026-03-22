@@ -42,6 +42,11 @@ jobs:
 
       - name: windows-config
         if: startsWith(matrix.os, 'windows')
+        run: |
+          dir c:\msys64
+
+      - name: windows-config
+        if: startsWith(matrix.os, 'windows')
         # TODO: equivalent of command -v for gcc, gfortran
         # why does CMake find objcopy but not gfortran?  try just "gfortran".
         run: |
