@@ -9,41 +9,14 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest]
-    env:
-      CIBW_BUILD: "cp313-win32"
-      CIBW_ENVIRONMENT: "CMAKE_ARGS='-DSLYCOT_BUNDLE_OPENBLAS=ON'"
-      SKBUILD_BUILD_VERBOSE: true
 
     steps:
-
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-          submodules: 'recursive'
-
-      - uses: actions/setup-python@v6
-
-      - name: macos-config
-        if: startsWith(matrix.os, 'macos')
-        # run a script that setups up commands slycot-gcc and slycot-gfortran
-        # these will be used in build and repair stages
-        run: |
-          bash ./build-tools/gha_cibw_setup_macos.sh
-          echo SKBUILD_CMAKE_ARGS="-G Ninja;-DCMAKE_Fortran_COMPILER=slycot-gfortran;-DCMAKE_C_COMPILER=slycot-gcc" >> $GITHUB_ENV
-
-      - name: macos-deployment-target-14
-        if: startsWith(matrix.os, 'macos-14')
-        run: echo MACOSX_DEPLOYMENT_TARGET=14.0 >> $GITHUB_ENV
-
-      - name: macos-deployment-target-15
-        if: startsWith(matrix.os, 'macos-15')
-        run: echo MACOSX_DEPLOYMENT_TARGET=15.0 >> $GITHUB_ENV
 
       - name: windows-config
         if: startsWith(matrix.os, 'windows')
         run: |
-          c:/msys64/mingw32/bin/i686-w64-mingw32-gcc -v --version
+          dir c:\msys64\mingw64\bin
+          c:\msys64\mingw32\bin\i686-w64-mingw32-gcc.exe -v --version
 
       # - name: windows-config
       #   if: startsWith(matrix.os, 'windows')
