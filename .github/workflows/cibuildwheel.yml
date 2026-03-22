@@ -8,7 +8,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-14] # ubuntu-latest, windows-latest, 
+        os: [macos-14, ubuntu-latest, windows-latest]
     env:
       CIBW_BUILD: "cp313-win_amd64 cp313-manylinux_x86_64 cp313-macosx_arm64"
       CIBW_ENVIRONMENT: "CMAKE_ARGS='-DSLYCOT_BUNDLE_OPENBLAS=ON'"
