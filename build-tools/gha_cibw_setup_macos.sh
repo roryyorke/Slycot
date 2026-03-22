@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Setup cibuildwheel for macOS on Github Actions
+# cibw_repair_wheel_macos.sh relies on links created here
+
 set -ex
 
 gfortran_bin=$(command -v gfortran-13)

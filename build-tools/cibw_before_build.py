@@ -1,8 +1,12 @@
 """cibuildwheel setup script
 
-Installs scipy_openblas32 version specified by command-line argument
+Usage
+  python cibw_before_build.py <scipy-openblas32-version> <project-root>
 
-Copies scipy_openblas32 to build-libs in project root.
+Installs scipy_openblas32 version given by first command-line argument.
+
+Copies scipy_openblas32 to build-libs in project root; project root
+given by second command-line argument.
 """
 
 import os
@@ -27,19 +31,20 @@ def install_openblas32(scipy_openblas32_version):
     )
 
 
-def copy_libraries():
+def copy_libraries(project_root):
     import scipy_openblas32
 
     src = scipy_openblas32.get_lib_dir()
-    dst = os.path.abspath("build-libs")
+    dst = os.path.join(project_root, "build-libs")
     print(f"{__file__}: Copying {src} to {dst}")
     shutil.copytree(src, dst)
 
 
 def main():
     version = sys.argv[1]
+    project_root = sys.argv[2]
     install_openblas32(version)
-    copy_libraries()
+    copy_libraries(project_root)
 
 
 if __name__ == "__main__":
