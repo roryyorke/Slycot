@@ -30,7 +30,7 @@ jobs:
         # these will be used in build and repair stages
         run: |
           bash ./tools/cibw-setup-macos.sh
-          echo SKBUILD_CMAKE_ARGS="-G Ninja;-DCMAKE_Fortran_COMPILER=slycot-gfortran;-DCMAKE_C_COMPILER=slycot-gcc;-DSLYCOT_OBJCOPY=slycot-objcopy" >> $GITHUB_ENV
+          echo SKBUILD_CMAKE_ARGS="-G Ninja;-DCMAKE_Fortran_COMPILER=slycot-gfortran;-DCMAKE_C_COMPILER=slycot-gcc" >> $GITHUB_ENV
 
       - name: macos-deployment-target-14
         if: startsWith(matrix.os, 'macos-14')
