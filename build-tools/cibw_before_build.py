@@ -36,6 +36,10 @@ def copy_libraries(project_root):
 
     src = scipy_openblas32.get_lib_dir()
     dst = os.path.join(project_root, "build-libs")
+    if os.path.exist(dst):
+        print(f'Deleting existing {dst}')
+        shutil.rmtree(dst)
+
     print(f"{__file__}: Copying {src} to {dst}")
     shutil.copytree(src, dst)
 
