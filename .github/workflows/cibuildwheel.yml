@@ -9,9 +9,10 @@ jobs:
     strategy:
       matrix:
         # os: [ubuntu-latest, windows-latest, windows-11-arm, macos-15-intel, macos-14]
-        os: [ubuntu-latest]
+        os: [macos-14]
     env:
-      CIBW_BUILD: "cp314-manylinux_x86_64"
+      CIBW_BUILD: "cp314-macosx_arm64"
+      MACOSX_DEPLOYMENT_TARGET: 14.0
       CIBW_ENVIRONMENT: "CMAKE_ARGS='-DSLYCOT_BUNDLE_OPENBLAS=ON'"
       SKBUILD_BUILD_VERBOSE: true
 
