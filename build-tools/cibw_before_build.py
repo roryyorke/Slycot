@@ -42,8 +42,6 @@ def copy_libraries(project_root):
 
     print(f"{__file__}: Copying {src} to {dst}")
     shutil.copytree(src, dst)
-    print(f"{dst} contents:")
-    print(os.listdir(dst))
 
 
 def main():
@@ -51,7 +49,6 @@ def main():
     project_root = sys.argv[2]
     install_openblas32(version)
     copy_libraries(project_root)
-    sys.exit(1)
 
 
 if __name__ == "__main__":
