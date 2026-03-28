@@ -22,7 +22,7 @@ if(SLYCOT_BUNDLE_OPENBLAS)
 
   find_library(
     OPENBLAS_LIBRARY_FILE
-    NAMES libscipy_openblas.lib libscipy_openblas.dylib libscipy_openblas.so
+    NAMES libscipy_openblas.lib libscipy_openblas.dylib libscipy_openblas.so scipy_openblas.lib
     PATHS ${OPENBLAS_DIR}
     NO_DEFAULT_PATH
     REQUIRED)
