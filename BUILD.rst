@@ -70,7 +70,10 @@ To specify the C and Fortran compilers and compilation flags use the CMake and s
   export CFLAGS=-Os # C compilation flags
   export FC=ifort # Fortran compiler
   export FFLAGS=-O3 # Fortran compilation flags
-  explort BLA_VENDOR=Atlas # BLAS/LAPACK library to use
+  export BLA_VENDOR=Atlas # BLAS/LAPACK library to use
+  export SKBUILD_BUILD_VERBOSE=true # verbose build
+
+There are other ways to specify these; see CMake and scikit-build-core docs.
 
 See `CMake`_ documentation for more in general, and `BLA_VENDOR`_ for
 information about specifying the BLAS/LAPACK library.
