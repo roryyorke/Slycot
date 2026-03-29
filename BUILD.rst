@@ -2,14 +2,16 @@
  Building Slycot
 =================
 
-Slycot can be built on at Linux, macOS, and Windows, in order of
-ease-of-build.  It can *probably* be built on other Unix-like systems
-with Python, CMake, and a BLAS/LAPACK library.
+Slycot can be built on Linux, macOS, and Windows, with building on
+Linux being easiest and Windows hardest.  It can *probably* be built
+on other Unix-like systems that have Python, CMake, and a BLAS/LAPACK
+library.
 
 Building from the sdist
 -----------------------
 
-This will build Slycot using the latest `source distribution (sdist)`_ on PyPi.
+This section describes building Slycot using the latest `source
+distribution (sdist)`_ on PyPi.
 
 .. _`source distribution (sdist)`: https://packaging.python.org/en/latest/glossary/#term-Source-Distribution-or-sdist
 
@@ -79,7 +81,7 @@ information about specifying the BLAS/LAPACK library.
 Building wheels
 ---------------
 
-Wheels are built with `cibuildwheel`_ via Github Actions.  A test build of wheels for the "manylinux" x86_64 target can be built locally using developer script `check-linux-cibw.bash`_ .  To use this script you must have installed cibuildwheel and `Docker`_.
+Wheels are built with `cibuildwheel`_ via Github Actions.  A test build of wheels for the "manylinux" x86_64 target can be built locally using developer script `check-linux-cibw.bash`_ .  To use this script you'll need to have installed cibuildwheel and `Docker`_.
 
 The wheels bundle the OpenBLAS libraries provided by `scipy-openblas-libs`_.
 
@@ -148,7 +150,7 @@ The build configuration must be:
 - compatible with building conda-forge packages
 - able to be built from source with user choice of compilers and BLAS/LAPACK vendor
 
-Most scikit-build-core configuration is in ``pyproject.toml``; see section `[tool.scikit-build]`.  Some directives are in the Github workflow files, especially those for building wheels.
+Most scikit-build-core configuration is in ``pyproject.toml``; see section ``[tool.scikit-build]`` in that file.  Some directives are in the Github workflow files, especially those for building wheels.
 
 The CMake configuration is in files ``CMakeLists.txt`` and
 ``slycot/CMakeLists.txt``.  The former is the top-level build file,
@@ -176,7 +178,7 @@ setup, which is handled by the ``[tool.cibuildwheel*]`` sections in
 
 
 Additional hints
-~~~~~~~~~~~~~~~~
+----------------
 
 Additional hints for how to install Slycot from source can be found in the
 `.github`_ directory , (commands used to build and test in the GitHub Actions
@@ -186,3 +188,12 @@ in the source code repository.
 
 .. _.github: https://github.com/python-control/Slycot/tree/master/.github
 .. _`logs from the GitHub Actions`: https://github.com/python-control/Slycot/actions
+
+SLICOT version
+--------------
+
+Slycot uses a patched version of SLICOT managed in this `python-control organisation repository`_.
+This SLICOT source is included the PyPI sdist, and will be automatically checked out if you use the
+``--recurse-submodules`` submodules command when cloning Slycot.
+
+.. _`python-control organisation repository`: https://github.com/python-control/SLICOT-Reference
