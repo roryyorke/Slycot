@@ -1,7 +1,8 @@
 @echo on
 
-@rem set CC=c:/mingw64/bin/gcc.exe
-set FC=c:/mingw64/bin/gfortran.exe
+echo "--conda-recipe bld.bat"
+
+set FC=%BUILD_PREFIX%\Library\bin\flang.exe
 set "SKBUILD_CONFIGURE_OPTIONS=-DBLA_VENDOR=Generic"
 set SKBUILD_BUILD_VERBOSE=true
 set "CMAKE_GENERATOR=Ninja"
