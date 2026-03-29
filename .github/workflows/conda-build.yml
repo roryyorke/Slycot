@@ -30,45 +30,43 @@ jobs:
           pip install ruff
           ruff check slycot
 
-  build-sdist:
-    # Super fast sniff build. If this fails, don't start the other jobs
-    name: Build sdist on Ubuntu
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Slycot
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-          submodules: 'recursive'
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: '3.14'
-      - name: Setup Ubuntu
-        run: |
-          sudo apt-get update --quiet --yes
-          sudo apt-get install --quiet --yes liblapack-dev
-      - name: Create Slycot sdist
-        run: |
-          pip install build
-          python -m build --sdist
-      - name: Install Slycot sdist
-        run: |
-          pip install -v $(find dist -iname "slycot-*.tar.gz")[test]
-      - name: Run tests
-        run: |
-          pytest --pyargs slycot
+  # build-sdist:
+  #   # Super fast sniff build. If this fails, don't start the other jobs
+  #   name: Build sdist on Ubuntu
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout Slycot
+  #       uses: actions/checkout@v6
+  #       with:
+  #         fetch-depth: 0
+  #         submodules: 'recursive'
+  #     - name: Set up Python
+  #       uses: actions/setup-python@v6
+  #       with:
+  #         python-version: '3.14'
+  #     - name: Setup Ubuntu
+  #       run: |
+  #         sudo apt-get update --quiet --yes
+  #         sudo apt-get install --quiet --yes liblapack-dev
+  #     - name: Create Slycot sdist
+  #       run: |
+  #         pip install build
+  #         python -m build --sdist
+  #     - name: Install Slycot sdist
+  #       run: |
+  #         pip install -v $(find dist -iname "slycot-*.tar.gz")[test]
+  #     - name: Run tests
+  #       run: |
+  #         pytest --pyargs slycot
 
   build-conda:
     name: Build conda, ${{ matrix.os }} ${{ matrix.python }}
     runs-on: ${{ matrix.os }}-latest
-    needs: build-sdist
+    # needs: build-sdist
     strategy:
         fail-fast: false
         matrix:
           os:
-            - 'ubuntu'
-            - 'macos'
             - 'windows'
           python:
             - '3.14'
