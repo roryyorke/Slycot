@@ -82,8 +82,7 @@ See `Building Slycot`_.
 Dependencies
 ------------
 
-Slycot supports Python versions 3.10 or later, and Numpy 1.26 or later
-(Numpy minimum version to-be-confirmed).
+Slycot supports Python versions 3.10 or later, and Numpy 2.0 or later.
 
 To run the Slycot unit tests and examples, you'll also need SciPy and
 pytest.
