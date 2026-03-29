@@ -10,9 +10,9 @@ osmap = {'linux': 'ubuntu',
          'win': 'windows',
          }
 
-combinations = {'ubuntu': ['unset', 'Generic', 'OpenBLAS', 'Intel10_64lp'],
-                'macos': ['unset', 'Generic', 'OpenBLAS'],
-                'windows': ['unset', 'Intel10_64lp'],
+combinations = {#'ubuntu': ['unset', 'Generic', 'OpenBLAS', 'Intel10_64lp'],
+                #'macos': ['unset', 'Generic', 'OpenBLAS'],
+                'windows': ['unset'] #, 'Intel10_64lp'],
                }
 
 conda_jobs = []
