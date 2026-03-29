@@ -54,7 +54,7 @@ jobs:
           python -m build --sdist
       - name: Install Slycot sdist
         run: |
-          pip install dist/slycot-*.tar.gz[test]
+          pip install -v $(find dist -iname "slycot-*.tar.gz")[test]
       - name: Run tests
         run: |
           pytest --pyargs slycot
