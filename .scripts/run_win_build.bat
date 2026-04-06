@@ -54,6 +54,10 @@ set "CONDA_LIBMAMBA_SOLVER_NO_CHANNELS_FROM_INSTALLED=1"
 
 :: Set basic configuration
 echo Setting up configuration
+echo %CD%
+dir
+dir .\.ci_support\%CONFIG%.yaml
+echo why does the next command not show up?
 setup_conda_rc .\ ".\recipe" .\.ci_support\%CONFIG%.yaml
 if !errorlevel! neq 0 exit /b !errorlevel!
 echo Running build setup
