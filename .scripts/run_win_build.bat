@@ -10,6 +10,10 @@
 :: UPLOAD_PACKAGES: true or false
 :: UPLOAD_ON_BRANCH: true or false
 
+echo on
+
+echo %CD%
+
 setlocal enableextensions enabledelayedexpansion
 
 FOR %%A IN ("%~dp0.") DO SET "REPO_ROOT=%%~dpA"
