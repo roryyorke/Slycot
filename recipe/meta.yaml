@@ -6,8 +6,7 @@ package:
   version: {{ version }}
 
 source:
-  url: https://pypi.org/packages/source/s/slycot/slycot-{{ version }}.tar.gz
-  sha256: {{ sha256 }}
+  git_url: ../
 
 build:
   number: 2
