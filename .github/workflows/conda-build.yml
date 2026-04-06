@@ -25,7 +25,7 @@ jobs:
             - '3.14'
 
     env:
-      CONFIG: 'win_64_python3.14.__cp314'
+      CONFIG: 'win_64_python3.14.____cp314'
       UPLOAD_PACKAGES: 'False'
       UPLOAD_ON_BRANCH: 'False'
       CI: 'github_actions'
