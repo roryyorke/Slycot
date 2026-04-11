@@ -13,19 +13,21 @@ on:
 jobs:
 
   build-conda:
-    name: Build conda, ${{ matrix.os }} ${{ matrix.python }}
-    runs-on: ${{ matrix.os }}-latest
+    name: Build conda ${{ matrix.config.name }}
     # needs: build-sdist
     strategy:
-        fail-fast: false
-        matrix:
-          os:
-            - 'windows'
-          python:
-            - '3.14'
+      fail-fast: true
+      matrix:
+        config:
+          - os: 'windows'
+            name: 'Windows 3.14'
+            env: CONFIG='win_64_python3.14.____cp314'
+          - os: 'ubuntu'
+            name: 'Linux 3.13'
+            env: CONFIG='linux_64_python3.13.____cp313.yaml'
+    runs-on: ${{ matrix.config.os }}-latest
 
     env:
-      CONFIG: 'win_64_python3.14.____cp314'
       UPLOAD_PACKAGES: 'False'
       UPLOAD_ON_BRANCH: 'False'
       CI: 'github_actions'
@@ -39,7 +41,17 @@ jobs:
           fetch-depth: 0
           submodules: 'recursive'
 
-      - name: Build
+      - name: Build Windows
+        if: startsWith(matrix.config.os, 'windows')
         shell: cmd
         run: |
           call ".scripts\run_win_build.bat"
+
+      - name: Build Linux
+        if: startsWith(matrix.config.os, 'ubuntu')
+        env:
+          GIT_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          IS_PR_BUILD: "True"
+        run: |
+          echo GIT_BRANCH is $GIT_BRANCH
+          .scripts/run_docker_build.sh
