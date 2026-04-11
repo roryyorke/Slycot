@@ -25,6 +25,8 @@ jobs:
           - os: 'ubuntu'
             name: 'Linux 3.13'
             config: 'linux_64_python3.13.____cp313.yaml'
+            docker_image: quay.io/condaforge/linux-anvil-x86_64:alma9
+
     runs-on: ${{ matrix.config.os }}-latest
 
     env:
@@ -51,8 +53,7 @@ jobs:
       - name: Build Linux
         if: startsWith(matrix.config.os, 'ubuntu')
         env:
-          GIT_BRANCH: ${{ github.event.workflow_run.head_branch }}
           IS_PR_BUILD: "True"
+          DOCKER_IMAGE: ${{ matrix.config.docker_image }}
         run: |
-          echo GIT_BRANCH is $GIT_BRANCH
           .scripts/run_docker_build.sh
