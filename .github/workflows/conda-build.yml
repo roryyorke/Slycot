@@ -21,13 +21,14 @@ jobs:
         config:
           - os: 'windows'
             name: 'Windows 3.14'
-            env: CONFIG='win_64_python3.14.____cp314'
+            config: 'win_64_python3.14.____cp314'
           - os: 'ubuntu'
             name: 'Linux 3.13'
-            env: CONFIG='linux_64_python3.13.____cp313.yaml'
+            config: 'linux_64_python3.13.____cp313.yaml'
     runs-on: ${{ matrix.config.os }}-latest
 
     env:
+      CONFIG: ${{ matrix.config.config }}
       UPLOAD_PACKAGES: 'False'
       UPLOAD_ON_BRANCH: 'False'
       CI: 'github_actions'
