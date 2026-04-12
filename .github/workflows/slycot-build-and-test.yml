@@ -38,7 +38,8 @@ jobs:
           channel-priority: strict
       - name: Conda build
         shell: powershell
+        env:
+          CONDA_BLD_PATH=c:\bld
         run: |
           conda info
           conda list
-          conda build conda-recipe --python ${{ matrix.python }}
