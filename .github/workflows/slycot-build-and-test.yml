@@ -34,7 +34,7 @@ jobs:
         with:
           activate-environment: build
           miniforge-version: latest
-          conda-build-version: latest
+          conda-build-version: 26.3.0
           channel-priority: strict
       - name: Conda build
         shell: powershell
