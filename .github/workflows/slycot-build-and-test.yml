@@ -39,7 +39,7 @@ jobs:
       - name: Conda build
         shell: powershell
         env:
-          CONDA_BLD_PATH=c:\bld
+          CONDA_BLD_PATH: c:\bld
         run: |
           conda info
           conda list
