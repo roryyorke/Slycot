@@ -37,7 +37,8 @@ jobs:
           conda-build-version: 26.3.0
           channel-priority: strict
       - name: Conda build
+        shell: cmd
         run: |
           conda info
           conda list
-          .\scripts\run_conda_forge_build_setup_win.bat
+          call .\scripts\run_conda_forge_build_setup_win.bat
