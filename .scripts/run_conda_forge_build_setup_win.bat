@@ -29,7 +29,10 @@
 
 set PYTHONUNBUFFERED=1
 
-conda.exe config --set show_channel_urls true
+call conda info
+conda.exe info
+
+call conda config --set show_channel_urls true
 conda.exe config --set auto_update_conda false
 conda.exe config --set add_pip_as_python_dependency false
 :: Otherwise packages that don't explicitly pin openssl in their requirements
