@@ -30,20 +30,19 @@
 set PYTHONUNBUFFERED=1
 
 call conda info
-conda.exe info
 
 call conda config --set show_channel_urls true
-conda.exe config --set auto_update_conda false
-conda.exe config --set add_pip_as_python_dependency false
+call conda config --set auto_update_conda false
+call conda config --set add_pip_as_python_dependency false
 :: Otherwise packages that don't explicitly pin openssl in their requirements
 :: are forced to the newest OpenSSL version, even if their dependencies don't
 :: support it.
-conda.exe config --env --append aggressive_update_packages ca-certificates
-conda.exe config --env --remove-key aggressive_update_packages
-conda.exe config --env --append aggressive_update_packages ca-certificates
-conda.exe config --env --append aggressive_update_packages certifi
+call conda config --env --append aggressive_update_packages ca-certificates
+call conda config --env --remove-key aggressive_update_packages
+call conda config --env --append aggressive_update_packages ca-certificates
+call conda config --env --append aggressive_update_packages certifi
 
-conda.exe config --set channel_priority strict
+call conda config --set channel_priority strict
 
 :: Set the conda-build working directory to a smaller path
 if "%CONDA_BLD_PATH%" == "" (
@@ -83,9 +82,9 @@ set CONDA_BUILD_SKIP_TESTS=0
 call activate base
 
 @echo on
-conda.exe info
-conda.exe config --show-sources
-conda.exe list --show-channel-urls
+call conda info
+call conda config --show-sources
+call conda list --show-channel-urls
 @echo off
 
-conda-build.exe conda-recipe --python 3.13
+call conda build conda-recipe --python 3.13

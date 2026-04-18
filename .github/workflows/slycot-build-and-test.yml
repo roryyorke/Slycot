@@ -39,6 +39,4 @@ jobs:
       - name: Conda build
         shell: cmd
         run: |
-          call conda info
-          call conda list
           call .\scripts\run_conda_forge_build_setup_win.bat
