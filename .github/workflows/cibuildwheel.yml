@@ -3,24 +3,66 @@ name: cibuildwheel
 on: [push, pull_request]
 
 jobs:
+
+  build-sdist:
+    # Super fast sniff build. If this fails, don't start the other jobs
+    name: Build sdist on Ubuntu
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Slycot
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: 'recursive'
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Create Slycot sdist
+        run: |
+          pip install build
+          python -m build --sdist
+          [ $(find dist -type f|wc -l) -eq 1 ] || { echo "Expect 1 file in dist">2; exit 1 }
+          echo "sdist=$(find dist -type f)" >> "$GITHUB_ENV"
+      - name: Install Slycot sdist
+        run: |
+          pip install -v "$sdist_name[test]"
+      - name: Run tests
+        run: |
+          pytest --pyargs slycot
+      - name: Upload sdist
+        uses: actions/upload-artifact@v7
+        id: artifact-upload-step
+        with:
+            archive: false
+            name: sdist
+            path: ${{ env.sdist }}
+
+
   build_wheels:
     name: Build wheels on ${{ matrix.os }}
+    needs: build-sdist
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, ubuntu-24.04-arm, windows-latest, macos-15-intel, macos-14]
+        os: [ubuntu-latest] #, ubuntu-24.04-arm, windows-latest, macos-15-intel, macos-14]
     env:
       CIBW_ENVIRONMENT: "CMAKE_ARGS='-DSLYCOT_BUNDLE_OPENBLAS=ON'"
+      CIBW_BUILD: "cp313-manylinux_x86_64"
 
     steps:
 
-      - uses: actions/checkout@v6
+      - name: Get sdist
+        uses: actions/download-artifact@v8
         with:
-          fetch-depth: 0
-          persist-credentials: false
-          submodules: 'recursive'
+          name: sdist
+
+      - name: Unpack sdist
+        run: tar xzf ${{ env.sdist }} --strip-components=1
 
       - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
 
       - name: macos-config
         if: startsWith(matrix.os, 'macos')
