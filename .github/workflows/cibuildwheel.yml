@@ -84,8 +84,8 @@ jobs:
       - name: macos-config
         if: startsWith(matrix.os, 'macos')
         run: |
-          gfortran_bin=$(command -v gfortran-13) || { echo gfortran-13 not found 1>&2; exit 1 }
-          gcc_bin=$(command -v gcc-13) { echo gcc-13 not found 1>&2; exit 1 }
+          gfortran_bin=$(command -v gfortran-13) || { echo gfortran-13 not found 1>&2; exit 1; }
+          gcc_bin=$(command -v gcc-13) { echo gcc-13 not found 1>&2; exit 1; }
           echo SKBUILD_CMAKE_ARGS="-G Ninja;-DCMAKE_Fortran_COMPILER=$gfortran_bin;-DCMAKE_C_COMPILER=$gcc_bin" >> $GITHUB_ENV
           SLYCOT_LIBS=$($gfortran_bin -print-search-dirs|grep "^libraries: ="|sed s/^libraries:\ =//)
           echo "SLYCOT_LIBS=$SLYCOT_LIBS" >> "$GITHUB_ENV"
