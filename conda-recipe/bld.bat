@@ -3,6 +3,8 @@ set LAPACK_ROOT=%PREFIX%
 
 set "SKBUILD_CONFIGURE_OPTIONS=-DBLA_VENDOR=Generic"
 set "CMAKE_GENERATOR=NMake Makefiles"
+set CMAKE_MSVC_DEBUG_INFORMATION_FORMAT=^"^"
+set MSVC_DEBUG_INFORMATION_FORMAT=^"^"
 "%PYTHON%" -m pip install -v .
 
 if errorlevel 1 exit 1
