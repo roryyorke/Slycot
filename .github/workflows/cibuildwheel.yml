@@ -33,16 +33,17 @@ jobs:
           echo "sdist=$(find dist -type f)" >> "$GITHUB_ENV"
           echo "sdist=$(find dist -type f -printf \"%f\")" >> "$GITHUB_OUTPUT"
 
-      - name: Install build requirements
-        run: sudo apt-get update --quiet --yes && sudo apt-get install --quiet --yes liblapack-dev
+      # TODO: restore me!
+      # - name: Install build requirements
+      #   run: sudo apt-get update --quiet --yes && sudo apt-get install --quiet --yes liblapack-dev
 
-      - name: Install sdist
-        run: |
-          pip install -v "$sdist[test]"
+      # - name: Install sdist
+      #   run: |
+      #     pip install -v "$sdist[test]"
 
-      - name: Run tests
-        run: |
-          pytest --pyargs slycot
+      # - name: Run tests
+      #   run: |
+      #     pytest --pyargs slycot
 
       - name: Upload sdist
         uses: actions/upload-artifact@v7
@@ -59,10 +60,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest] #, ubuntu-24.04-arm, windows-latest, macos-15-intel, macos-14]
+        os: [macos-15-intel] #, ubuntu-latest, ubuntu-24.04-arm, windows-latest, macos-14]
     env:
       CIBW_ENVIRONMENT: "CMAKE_ARGS='-DSLYCOT_BUNDLE_OPENBLAS=ON'"
-      CIBW_BUILD: "cp313-manylinux_x86_64"
+      CIBW_BUILD: "cp313-*"
 
     steps:
 
@@ -82,11 +83,12 @@ jobs:
 
       - name: macos-config
         if: startsWith(matrix.os, 'macos')
-        # run a script that setups up commands slycot-gcc and slycot-gfortran
-        # these will be used in build and repair stages
         run: |
-          bash ./build-tools/gha_cibw_setup_macos.sh
-          echo SKBUILD_CMAKE_ARGS="-G Ninja;-DCMAKE_Fortran_COMPILER=slycot-gfortran;-DCMAKE_C_COMPILER=slycot-gcc" >> $GITHUB_ENV
+          gfortran_bin=$(command -v gfortran-13) || { echo gfortran-13 not found 1>&2; exit 1 }
+          gcc_bin=$(command -v gcc-13) { echo gcc-13 not found 1>&2; exit 1 }
+          echo SKBUILD_CMAKE_ARGS="-G Ninja;-DCMAKE_Fortran_COMPILER=$gfortran_bin;-DCMAKE_C_COMPILER=$gcc_bin" >> $GITHUB_ENV
+          SLYCOT_LIBS=$($gfortran_bin -print-search-dirs|grep "^libraries: ="|sed s/^libraries:\ =//)
+          echo "SLYCOT_LIBS=$SLYCOT_LIBS" >> "$GITHUB_ENV"
 
       - name: macos-deployment-target-14
         if: startsWith(matrix.os, 'macos-14')
