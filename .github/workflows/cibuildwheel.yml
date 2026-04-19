@@ -93,7 +93,15 @@ jobs:
       - name: check variables
         run: |
           set -ex
-          [ -z "${SLYCOT_LIBS+x}" ] && { echo "Variable SLYCOT_LIBS must be defined"; }
+          if [ -z "${SLYCOT_LIBS+x}" ]; then
+             echo "Variable SLYCOT_LIBS must be defined" 1>&2
+             exit 1
+          fi
+
+          if [ -z "${NO_SUCH+x}" ]; then
+             echo "Variable NO_SUCH must be defined" 1>&2
+          fi
+
 
       - name: macos-deployment-target-14
         if: startsWith(matrix.os, 'macos-14')

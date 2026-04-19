@@ -17,7 +17,10 @@ dest_dir=$1
 wheel=$2
 project_root=$3
 
-[ -z "${SLYCOT_LIBS+x}" ] && { echo "Variable SLYCOT_LIBS must be defined" 1>&2; exit 1; }
+if [ -z "${SLYCOT_LIBS+x}" ]; then
+   echo "Variable SLYCOT_LIBS must be defined" 1>&2
+   exit 1
+fi
 
 # copied from Scipy
 # See https://github.com/scipy/scipy/issues/20852
