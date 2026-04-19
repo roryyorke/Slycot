@@ -104,7 +104,7 @@ jobs:
       - name: Build wheels
         run: |
           if [ -z "${SLYCOT_LIBS+x}" ]; then
-            export CIBW_ENVIRONMENT="SLYCOT_LIBS=$SLYCOT_LIBS"
+            export CIBW_ENVIRONMENT="SLYCOT_LIBS=$SLYCOT_LIBS $CIBW_ENVIRONMENT"
           fi
           python -m cibuildwheel --output-dir wheelhouse ${{ needs.build-sdist.outputs.sdist-name }}
 
