@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       sdist-id: ${{ steps.artifact-upload-step.outputs.artifact-id }}
+      sdist-name: ${{ steps.create-sdist.outputs.sdist }}
 
     steps:
       - name: Checkout Slycot
@@ -24,20 +25,19 @@ jobs:
           python-version: '3.14'
 
       - name: Create Slycot sdist
+        id: create-sdist
         run: |
           pip install build
           python -m build --sdist
           [ $(find dist -type f|wc -l) -eq 1 ] || { echo "Expect 1 file in dist" 1>&2; exit 1; }
           echo "sdist=$(find dist -type f)" >> "$GITHUB_ENV"
+          echo "sdist=$(find dist -type f)" >> "$GITHUB_OUTPUT"
 
       - name: Install build requirements
         run: sudo apt-get update --quiet --yes && sudo apt-get install --quiet --yes liblapack-dev
 
       - name: Install sdist
         run: |
-          set -eux
-          echo sdist is $sdist
-          echo github context env.sdist is ${{ env.sdist }}
           pip install -v "$sdist[test]"
 
       - name: Run tests
@@ -69,12 +69,12 @@ jobs:
       - name: Get sdist
         uses: actions/download-artifact@v8
         with:
-          artifact-ids: ${{needs.build-sdist.outputs.sdist-id}}
+          artifact-ids: ${{ needs.build-sdist.outputs.sdist-id }}
           # todo: check if this is needed
           skip-decompress: true
 
       - name: Unpack sdist
-        run: tar xzf ${{ env.sdist }} --strip-components=1
+        run: tar xzf ${{ needs.build-sdist.outputs.sdist-name }} --strip-components=1
 
       - uses: actions/setup-python@v6
         with:
