@@ -5,7 +5,11 @@
 #  Usage:
 #    bash cibw_repair_wheel_macos.sh <dest-dir> <wheel> <project-root-dir>
 #
-# Requires environment variable SLYCOT_LIBS; this is a list of compiler runtime libraries.
+# Requires environment variable SLYCOT_LIBS; this is a list of
+# compiler runtime libraries.  For gfortran, such a list can be
+# generated with
+#
+#  gfortran -print-search-dirs|grep "^libraries: ="|sed s/^libraries:\ =//
 
 set -ex
 
@@ -13,7 +17,7 @@ dest_dir=$1
 wheel=$2
 project_root=$3
 
-[ -v SLYCOT_LIBS ] || { echo "Variable SLYCOT_LIBS must be defined" 1>&2; exit 1 }
+[ -v SLYCOT_LIBS ] || { echo "Variable SLYCOT_LIBS must be defined" 1>&2; exit 1; }
 
 # copied from Scipy
 # See https://github.com/scipy/scipy/issues/20852
