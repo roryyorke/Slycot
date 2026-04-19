@@ -11,7 +11,7 @@
 #
 #  gfortran -print-search-dirs|grep "^libraries: ="|sed s/^libraries:\ =//
 
-set -ex
+set -e
 
 dest_dir=$1
 wheel=$2
