@@ -54,8 +54,8 @@ ignore = [ "E741" ]
 [tool.cibuildwheel]
 # scipy-openblas32 version specified here
 before-build = "python {project}/build-tools/cibw_before_build.py 0.3.31.22.1 {project}"
-test-requires = ['pytest', 'scipy', 'control[test]@git+https://github.com/python-control/python-control']
-test-command = "pytest --pyargs slycot && pytest -Wignore::pytest.PytestUnknownMarkWarning --pyargs control -m slycot"
+test-command = "pytest --pyargs slycot"
+test-extras = ['test']
 
 skip = ["cp38-*", "cp39-*", "cp3??t-*", "*-win32", "*-win_arm64"]
 

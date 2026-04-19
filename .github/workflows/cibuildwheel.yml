@@ -64,6 +64,8 @@ jobs:
     env:
       CIBW_ENVIRONMENT: "CMAKE_ARGS='-DSLYCOT_BUNDLE_OPENBLAS=ON'"
       CIBW_BUILD: "cp313-*"
+      CIBW_TEST_REQUIRES: "control[test]@git+https://github.com/python-control/python-control"
+      CIBW_TEST_COMMAND: "pytest --pyargs slycot && pytest -Wignore::pytest.PytestUnknownMarkWarning --pyargs control -m slycot"
 
     steps:
 
