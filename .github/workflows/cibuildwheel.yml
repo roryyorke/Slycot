@@ -109,8 +109,9 @@ jobs:
       - name: Build wheels
         run: |
           set -x
-          echo $SLYCOT_LIBS
-          export SLYCOT_LIBS
+          if [ -v SLYCOT_LIBS ]; then
+            export CIBW_ENVIRONMENT="SLYCOT_LIBS=$SLYCOT_LIBS"
+          fi
           python -m cibuildwheel --output-dir wheelhouse ${{ needs.build-sdist.outputs.sdist-name }}
 
       - uses: actions/upload-artifact@v6
