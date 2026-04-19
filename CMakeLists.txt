@@ -6,6 +6,8 @@ cmake_policy(SET CMP0074 NEW)
 
 project(slycot LANGUAGES NONE)
 
+set(MSVC_DEBUG_INFORMATION_FORMAT "")
+
 enable_language(C)
 enable_language(Fortran)
 
