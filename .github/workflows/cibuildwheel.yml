@@ -26,7 +26,10 @@ jobs:
           echo "sdist=$(find dist -type f)" >> "$GITHUB_ENV"
       - name: Install Slycot sdist
         run: |
-          pip install -v "$sdist_name[test]"
+          set -eux
+          echo sdist is $sdist
+          echo github context env.sdist is ${{ env.sdist }}
+          pip install -v "$sdist[test]"
       - name: Run tests
         run: |
           pytest --pyargs slycot
