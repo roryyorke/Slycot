@@ -107,7 +107,11 @@ jobs:
         run: python -m pip install cibuildwheel==3.3.1
 
       - name: Build wheels
-        run:  python -m cibuildwheel --output-dir wheelhouse ${{ needs.build-sdist.outputs.sdist-name }}
+        run: |
+          set -x
+          echo $SLYCOT_LIBS
+          export SLYCOT_LIBS
+          python -m cibuildwheel --output-dir wheelhouse ${{ needs.build-sdist.outputs.sdist-name }}
 
       - uses: actions/upload-artifact@v6
         with:
