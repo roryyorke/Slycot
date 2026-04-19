@@ -73,8 +73,8 @@ jobs:
           # todo: check if this is needed
           skip-decompress: true
 
-      - name: Unpack sdist
-        run: tar xzf ${{ needs.build-sdist.outputs.sdist-name }} --strip-components=1
+      # - name: Unpack sdist
+      #   run: tar xzf ${{ needs.build-sdist.outputs.sdist-name }} --strip-components=1
 
       - uses: actions/setup-python@v6
         with:
@@ -105,7 +105,7 @@ jobs:
         run: python -m pip install cibuildwheel==3.3.1
 
       - name: Build wheels
-        run:  python -m cibuildwheel --output-dir wheelhouse
+        run:  python -m cibuildwheel --output-dir wheelhouse ${{ needs.build-sdist.outputs.sdist-name }}
 
       - uses: actions/upload-artifact@v6
         with:
