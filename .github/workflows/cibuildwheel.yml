@@ -22,7 +22,7 @@ jobs:
         run: |
           pip install build
           python -m build --sdist
-          [ $(find dist -type f|wc -l) -eq 1 ] || { echo "Expect 1 file in dist">2; exit 1 }
+          [ $(find dist -type f|wc -l) -eq 1 ] || { echo "Expect 1 file in dist" 1>&2; exit 1; }
           echo "sdist=$(find dist -type f)" >> "$GITHUB_ENV"
       - name: Install Slycot sdist
         run: |
