@@ -94,12 +94,11 @@ jobs:
         run: |
           set -ex
           echo $SLYCOT_LIBS
-          if [ -v SHELL ]; then echo OK; fi
-          if [ -v SLYCOT_LIBS ]; then echo $SLYCOT_LIBS; fi
-          if [ -v SLYCOT_LIBS ]; then
+          if [ -z "${SHELL+x}" ]; then echo OK; fi
+          if [ -z "${SLYCOT_LIBS+x}" ]; then echo $SLYCOT_LIBS; fi
+          if [ -z "${SLYCOT_LIBS+x}" ]; then
             export CIBW_ENVIRONMENT="SLYCOT_LIBS=$SLYCOT_LIBS"
           fi
-          exit 1 # force failure
 
       - name: macos-deployment-target-14
         if: startsWith(matrix.os, 'macos-14')
@@ -120,7 +119,7 @@ jobs:
       - name: Build wheels
         run: |
           set -ex
-          if [ -v SLYCOT_LIBS ]; then
+          if [ -z "${SLYCOT_LIBS+x}" ]; then
             export CIBW_ENVIRONMENT="SLYCOT_LIBS=$SLYCOT_LIBS"
           fi
           python -m cibuildwheel --output-dir wheelhouse ${{ needs.build-sdist.outputs.sdist-name }}
