@@ -31,7 +31,7 @@ jobs:
           python -m build --sdist
           [ $(find dist -type f|wc -l) -eq 1 ] || { echo "Expect 1 file in dist" 1>&2; exit 1; }
           echo "sdist=$(find dist -type f)" >> "$GITHUB_ENV"
-          echo "sdist=$(find dist -type f)" >> "$GITHUB_OUTPUT"
+          echo "sdist=$(find dist -type f -printf \"%f\")" >> "$GITHUB_OUTPUT"
 
       - name: Install build requirements
         run: sudo apt-get update --quiet --yes && sudo apt-get install --quiet --yes liblapack-dev
