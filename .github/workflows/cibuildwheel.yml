@@ -93,12 +93,7 @@ jobs:
       - name: check variables
         run: |
           set -ex
-          echo $SLYCOT_LIBS
-          if [ -z "${SHELL+x}" ]; then echo OK; fi
-          if [ -z "${SLYCOT_LIBS+x}" ]; then echo $SLYCOT_LIBS; fi
-          if [ -z "${SLYCOT_LIBS+x}" ]; then
-            export CIBW_ENVIRONMENT="SLYCOT_LIBS=$SLYCOT_LIBS"
-          fi
+          [ -z "${SLYCOT_LIBS+x}" ] && { echo "Variable SLYCOT_LIBS must be defined"; }
 
       - name: macos-deployment-target-14
         if: startsWith(matrix.os, 'macos-14')
