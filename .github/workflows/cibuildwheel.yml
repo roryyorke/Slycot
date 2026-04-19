@@ -90,6 +90,17 @@ jobs:
           SLYCOT_LIBS=$($gfortran_bin -print-search-dirs|grep "^libraries: ="|sed s/^libraries:\ =//)
           echo "SLYCOT_LIBS=$SLYCOT_LIBS" >> "$GITHUB_ENV"
 
+      - name: check variables
+        run: |
+          set -ex
+          echo $SLYCOT_LIBS
+          if [ -v SHELL ]; then echo OK; fi
+          if [ -v SLYCOT_LIBS ]; then echo $SLYCOT_LIBS; fi
+          if [ -v SLYCOT_LIBS ]; then
+            export CIBW_ENVIRONMENT="SLYCOT_LIBS=$SLYCOT_LIBS"
+          fi
+          exit 1 # force failure
+
       - name: macos-deployment-target-14
         if: startsWith(matrix.os, 'macos-14')
         run: echo MACOSX_DEPLOYMENT_TARGET=14.0 >> $GITHUB_ENV
@@ -108,7 +119,7 @@ jobs:
 
       - name: Build wheels
         run: |
-          set -x
+          set -ex
           if [ -v SLYCOT_LIBS ]; then
             export CIBW_ENVIRONMENT="SLYCOT_LIBS=$SLYCOT_LIBS"
           fi
