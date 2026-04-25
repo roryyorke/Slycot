@@ -55,61 +55,106 @@ jobs:
             if-no-files-found: error
             path: ${{ env.sdist }}
 
-  build_wheels:
-    name: Build wheels on ${{ matrix.os }}
+  test_lapack_vendors:
+    name: Build and test with BLAS/LAPACK from ${{ matrix.lapack.name }}
     needs: build-sdist
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
+
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-15-intel, windows-latest] #, ubuntu-24.04-arm,  macos-14]
+        lapack:
+          - name: Netlib
+            package: liblapack-dev
+            BLA_VENDOR: Generic
+          - name: OpenBLAS
+            package: libopenblas-dev
+            BLA_VENDOR: OpenBLAS
+          - name: Intel MKL
+            package: libmkl-dev
+            BLA_VENDOR: Intel10_64_dyn
+
     env:
-      CIBW_ENVIRONMENT: "CMAKE_ARGS='-DSLYCOT_BUNDLE_OPENBLAS=ON'"
-      CIBW_BUILD: "cp313-*"
-      CIBW_TEST_REQUIRES: "control[test]@git+https://github.com/python-control/python-control"
-      CIBW_TEST_COMMAND: "pytest --pyargs slycot && pytest -Wignore::pytest.PytestUnknownMarkWarning --pyargs control -m slycot"
+      DEBIAN_FRONTEND: noninteractive
+      BLA_VENDOR: ${{ matrix.lapack.BLA_VENDOR }}
 
     steps:
-
       - name: Get sdist
         uses: actions/download-artifact@v8
         with:
           artifact-ids: ${{ needs.build-sdist.outputs.sdist-id }}
 
-      - uses: actions/setup-python@v6
+      - name: Set up Python
+        uses: actions/setup-python@v6
         with:
           python-version: '3.14'
 
-      - name: macos-config
-        if: startsWith(matrix.os, 'macos')
+      - name: Install dependencies
         run: |
-          set -x
-          gfortran_bin=$(command -v gfortran-13) || { echo "gfortran-13 not found" 1>&2; exit 1; }
-          gcc_bin=$(command -v gcc-13) || { echo "gcc-13 not found" 1>&2; exit 1; }
-          echo SKBUILD_CMAKE_ARGS="-G Ninja;-DCMAKE_Fortran_COMPILER=$gfortran_bin;-DCMAKE_C_COMPILER=$gcc_bin" >> $GITHUB_ENV
-          SLYCOT_LIBS=$($gfortran_bin -print-search-dirs|grep "^libraries: ="|sed s/^libraries:\ =//)
-          echo CIBW_ENVIRONMENT="SLYCOT_LIBS=$SLYCOT_LIBS $CIBW_ENVIRONMENT" >> "$GITHUB_ENV"
+          sudo apt-get update --quiet --yes && sudo apt-get install --quiet --yes ${{ matrix.lapack.package }}
 
-      - name: macos-deployment-target-14
-        if: startsWith(matrix.os, 'macos-14')
-        run: echo MACOSX_DEPLOYMENT_TARGET=14.0 >> $GITHUB_ENV
-
-      - name: macos-deployment-target-15
-        if: startsWith(matrix.os, 'macos-15')
-        run: echo MACOSX_DEPLOYMENT_TARGET=15.0 >> $GITHUB_ENV
-
-      - name: windows-config
-        if: startsWith(matrix.os, 'windows')
+      - name: Build and test
         run: |
-          echo SKBUILD_CMAKE_ARGS="-G Ninja;-DCMAKE_Fortran_COMPILER=c:/mingw64/bin/gfortran.exe;-DCMAKE_C_COMPILER=c:/mingw64/bin/gcc.exe" >> $env:GITHUB_ENV
+          if [ -a venv ]; then echo "venv already exists"; exit 1; fi
+          python -m venv venv
+          source venv/bin/activate
+          pip install -v ${{ needs.build-sdist.outputs.sdist-name }}[test]
+          pytest --pyargs
 
-      - name: Install cibuildwheel
-        run: python -m pip install cibuildwheel==3.3.1
+  # build_wheels:
+  #   name: Build wheels on ${{ matrix.os }}
+  #   needs: build-sdist
+  #   runs-on: ${{ matrix.os }}
+  #   strategy:
+  #     matrix:
+  #       os: [ubuntu-latest, macos-15-intel, windows-latest] #, ubuntu-24.04-arm,  macos-14]
+  #   env:
+  #     CIBW_ENVIRONMENT: "CMAKE_ARGS='-DSLYCOT_BUNDLE_OPENBLAS=ON'"
+  #     CIBW_BUILD: "cp313-*"
+  #     CIBW_TEST_REQUIRES: "control[test]@git+https://github.com/python-control/python-control"
+  #     CIBW_TEST_COMMAND: "pytest --pyargs slycot && pytest -Wignore::pytest.PytestUnknownMarkWarning --pyargs control -m slycot"
 
-      - name: Build wheels
-        run: |
-          python -m cibuildwheel --output-dir wheelhouse ${{ needs.build-sdist.outputs.sdist-name }}
+  #   steps:
 
-      - uses: actions/upload-artifact@v6
-        with:
-          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
-          path: ./wheelhouse/*.whl
+  #     - name: Get sdist
+  #       uses: actions/download-artifact@v8
+  #       with:
+  #         artifact-ids: ${{ needs.build-sdist.outputs.sdist-id }}
+
+  #     - uses: actions/setup-python@v6
+  #       with:
+  #         python-version: '3.14'
+
+  #     - name: macos-config
+  #       if: startsWith(matrix.os, 'macos')
+  #       run: |
+  #         set -x
+  #         gfortran_bin=$(command -v gfortran-13) || { echo "gfortran-13 not found" 1>&2; exit 1; }
+  #         gcc_bin=$(command -v gcc-13) || { echo "gcc-13 not found" 1>&2; exit 1; }
+  #         echo SKBUILD_CMAKE_ARGS="-G Ninja;-DCMAKE_Fortran_COMPILER=$gfortran_bin;-DCMAKE_C_COMPILER=$gcc_bin" >> $GITHUB_ENV
+  #         SLYCOT_LIBS=$($gfortran_bin -print-search-dirs|grep "^libraries: ="|sed s/^libraries:\ =//)
+  #         echo CIBW_ENVIRONMENT="SLYCOT_LIBS=$SLYCOT_LIBS $CIBW_ENVIRONMENT" >> "$GITHUB_ENV"
+
+  #     - name: macos-deployment-target-14
+  #       if: startsWith(matrix.os, 'macos-14')
+  #       run: echo MACOSX_DEPLOYMENT_TARGET=14.0 >> $GITHUB_ENV
+
+  #     - name: macos-deployment-target-15
+  #       if: startsWith(matrix.os, 'macos-15')
+  #       run: echo MACOSX_DEPLOYMENT_TARGET=15.0 >> $GITHUB_ENV
+
+  #     - name: windows-config
+  #       if: startsWith(matrix.os, 'windows')
+  #       run: |
+  #         echo SKBUILD_CMAKE_ARGS="-G Ninja;-DCMAKE_Fortran_COMPILER=c:/mingw64/bin/gfortran.exe;-DCMAKE_C_COMPILER=c:/mingw64/bin/gcc.exe" >> $env:GITHUB_ENV
+
+  #     - name: Install cibuildwheel
+  #       run: python -m pip install cibuildwheel==3.3.1
+
+  #     - name: Build wheels
+  #       run: |
+  #         python -m cibuildwheel --output-dir wheelhouse ${{ needs.build-sdist.outputs.sdist-name }}
+
+  #     - uses: actions/upload-artifact@v6
+  #       with:
+  #         name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
+  #         path: ./wheelhouse/*.whl
