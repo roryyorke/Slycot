@@ -33,8 +33,11 @@ jobs:
           channel-priority: strict
       - name: Conda build
         shell: bash -el {0}
+        env:
+          SKBUILD_CMAKE_ARGS: "-G Ninja"
         run: |
-          set -e
+          set -ex
+          echo $SKBUILD_CMAKE_ARGS
           conda build conda-recipe --python ${{ matrix.python }}
           # preserve directory structure for custom conda channel
           CONDA_ROOT=$(conda info --base)
