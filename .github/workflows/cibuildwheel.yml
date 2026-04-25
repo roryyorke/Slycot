@@ -67,7 +67,7 @@ jobs:
         continue-on-error: true
 
 
-  test_lapack_vendors:
+  test-lapack-vendors:
     name: Build and test with BLAS & LAPACK from ${{ matrix.lapack.name }}
     needs: build-sdist
     runs-on: ubuntu-latest
@@ -107,16 +107,15 @@ jobs:
           pip install --verbose ${{ needs.build-sdist.outputs.sdist-name }}[test]
           pytest --pyargs slycot
 
-  build_wheels:
+  build-wheels:
     name: Build wheels on ${{ matrix.os }}
-    needs: build-sdist
+    needs: [build-sdist, test-lapack-vendors]
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-15-intel, windows-latest] #, ubuntu-24.04-arm,  macos-14]
+        os: [ubuntu-latest, macos-15-intel, windows-latest, ubuntu-24.04-arm,  macos-14]
     env:
       CIBW_ENVIRONMENT: "CMAKE_ARGS='-DSLYCOT_BUNDLE_OPENBLAS=ON'"
-      CIBW_BUILD: "cp313-*"
       CIBW_TEST_REQUIRES: "control[test]@git+https://github.com/python-control/python-control"
       CIBW_TEST_COMMAND: "pytest --pyargs slycot && pytest -Wignore::pytest.PytestUnknownMarkWarning --pyargs control -m slycot"
 
