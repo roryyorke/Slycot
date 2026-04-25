@@ -3,6 +3,9 @@
 echo "bld.bat"
 
 echo SKBUILD_CMAKE_ARGS is - %SKBUILD_CMAKE_ARGS% -
+set CMAKE_MSVC_DEBUG_INFORMATION_FORMAT="\"\""
+
+echo CMAKE_MSVC_DEBUG_INFORMATION_FORMAT is %CMAKE_MSVC_DEBUG_INFORMATION_FORMAT%
 
 %PYTHON% -m pip install --no-deps --no-build-isolation -vv .
 if %ERRORLEVEL% neq 0 exit 1
