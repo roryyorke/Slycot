@@ -13,7 +13,7 @@ jobs:
       sdist-name: ${{ steps.create-sdist.outputs.sdist }}
 
     steps:
-      - name: Checkout Slycot
+      - name: Checkout source
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
@@ -24,7 +24,12 @@ jobs:
         with:
           python-version: '3.14'
 
-      - name: Create Slycot sdist
+      - name: Run linter
+        run: |
+          pip install ruff
+          ruff check slycot
+
+      - name: Create sdist
         id: create-sdist
         run: |
           pip install build
@@ -38,7 +43,7 @@ jobs:
 
       - name: Install sdist
         run: |
-          pip install -v "$sdist[test]" pytest-cov
+          pip install --verbose "$sdist[test]" pytest-cov
 
       - name: Run tests
         run: |
@@ -55,27 +60,25 @@ jobs:
             if-no-files-found: error
             path: ${{ env.sdist }}
 
+      # TODO: coveralls
+
   test_lapack_vendors:
-    name: Build and test with BLAS/LAPACK from ${{ matrix.lapack.name }}
+    name: Build and test with BLAS & LAPACK from ${{ matrix.lapack.name }}
     needs: build-sdist
     runs-on: ubuntu-latest
+    env:
+      DEBIAN_FRONTEND: noninteractive
+      BLA_VENDOR: ${{ matrix.lapack.BLA_VENDOR }}
 
     strategy:
       matrix:
         lapack:
-          - name: Netlib
-            package: liblapack-dev
-            BLA_VENDOR: Generic
           - name: OpenBLAS
             package: libopenblas-dev
             BLA_VENDOR: OpenBLAS
           - name: Intel MKL
             package: libmkl-dev
             BLA_VENDOR: Intel10_64_dyn
-
-    env:
-      DEBIAN_FRONTEND: noninteractive
-      BLA_VENDOR: ${{ matrix.lapack.BLA_VENDOR }}
 
     steps:
       - name: Get sdist
@@ -94,11 +97,10 @@ jobs:
 
       - name: Build and test
         run: |
-          if [ -a venv ]; then echo "venv already exists"; exit 1; fi
           python -m venv venv
           source venv/bin/activate
-          pip install -v ${{ needs.build-sdist.outputs.sdist-name }}[test]
-          pytest --pyargs
+          pip install --verbose ${{ needs.build-sdist.outputs.sdist-name }}[test]
+          pytest --pyargs slycot
 
   # build_wheels:
   #   name: Build wheels on ${{ matrix.os }}
