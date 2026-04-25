@@ -34,10 +34,7 @@ jobs:
       - name: Conda build
         shell: bash -el {0}
         env:
-          SKBUILD_CMAKE_ARGS: "-GNinja;-DVERBOSE=ON"
           PYTHONUNBUFFERED: "1"
-          SKBUILD_BUILD_VERBOSE: "true"
-          SKBUILD_LOGGING_LEVEL: "INFO"
         run: |
           set -ex
           echo $SKBUILD_CMAKE_ARGS
