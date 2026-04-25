@@ -33,17 +33,19 @@ jobs:
           echo "sdist=$(find dist -type f)" >> "$GITHUB_ENV"
           echo "sdist=$(find dist -type f -printf \"%f\")" >> "$GITHUB_OUTPUT"
 
-      # TODO: restore me!
-      # - name: Install build requirements
-      #   run: sudo apt-get update --quiet --yes && sudo apt-get install --quiet --yes liblapack-dev
+      - name: Install build requirements
+        run: sudo apt-get update --quiet --yes && sudo apt-get install --quiet --yes liblapack-dev
 
-      # - name: Install sdist
-      #   run: |
-      #     pip install -v "$sdist[test]"
+      - name: Install sdist
+        run: |
+          pip install -v "$sdist[test]" pytest-cov
 
-      # - name: Run tests
-      #   run: |
-      #     pytest --pyargs slycot
+      - name: Run tests
+        run: |
+          mkdir test-tmp
+          cd test-tmp
+          pytest --cov=slycot --pyargs slycot
+          coverage xml
 
       - name: Upload sdist
         uses: actions/upload-artifact@v7
@@ -52,7 +54,6 @@ jobs:
             archive: false
             if-no-files-found: error
             path: ${{ env.sdist }}
-
 
   build_wheels:
     name: Build wheels on ${{ matrix.os }}
