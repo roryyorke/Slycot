@@ -60,7 +60,12 @@ jobs:
             if-no-files-found: error
             path: ${{ env.sdist }}
 
-      # TODO: coveralls
+      - name: Coveralls
+        uses: coverallsapp/github-action@v2
+        with:
+          file: test-tmp/coverage.xml
+        continue-on-error: true
+
 
   test_lapack_vendors:
     name: Build and test with BLAS & LAPACK from ${{ matrix.lapack.name }}
