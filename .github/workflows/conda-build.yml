@@ -7,7 +7,7 @@ on:
 jobs:
 
   build-conda:
-    name: Build conda, ${{ matrix.os }} ${{ matrix.python }}
+    name: Build conda on ${{ matrix.os }} with Python ${{ matrix.python }}
     runs-on: ${{ matrix.os }}-latest
     strategy:
         fail-fast: false
@@ -29,7 +29,6 @@ jobs:
         uses: conda-incubator/setup-miniconda@v3
         with:
           auto-update-conda: true
-          python-version: ${{ matrix.python }}
           activate-environment: build-env
           miniforge-version: latest
           conda-build-version: 26.3.0
@@ -39,6 +38,5 @@ jobs:
         env:
           PYTHONUNBUFFERED: "1"
         run: |
-          set -ex
-          echo $SKBUILD_CMAKE_ARGS
+          set -e
           conda build conda-recipe --python ${{ matrix.python }}
