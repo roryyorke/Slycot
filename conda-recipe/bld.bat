@@ -1,5 +1,8 @@
 @echo on
 
+echo "bld.bat"
+
+set "SKBUILD_CMAKE_ARGS=-G Ninja"
 %PYTHON% -m pip install --no-deps --no-build-isolation -vv .
 if %ERRORLEVEL% neq 0 exit 1
 
