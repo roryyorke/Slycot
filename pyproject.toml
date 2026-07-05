@@ -63,6 +63,7 @@ test-extras = ['test']
 skip = ["cp38-*", "cp39-*", "cp3??t-*", "*-win32", "*-win_arm64"]
 
 [tool.cibuildwheel.linux]
+before-all = "pipx install -f patchelf==0.19.0.0rc1"
 repair-wheel-command = [
   "LD_LIBRARY_PATH=./build-libs",
   "auditwheel repair -w {dest_dir} {wheel}",
