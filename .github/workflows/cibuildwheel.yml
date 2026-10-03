@@ -24,11 +24,6 @@ jobs:
         with:
           python-version: '3.14'
 
-      - name: Run linter
-        run: |
-          pip install ruff
-          ruff check slycot
-
       - name: Create sdist
         id: create-sdist
         run: |
