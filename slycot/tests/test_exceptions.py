@@ -29,7 +29,7 @@ from slycot.exceptions import (SlycotError, SlycotParameterError,
                                SlycotWarning, raise_if_slycot_error)
 
 
-def assert_docstring_parse(docstring, exception_class, erange, checkvars={}):
+def assert_docstring_parse(docstring, exception_class, erange, checkvars):
     """To check that a docstring can be parsed into exceptions
     See also raise_if_slycot_error
 
