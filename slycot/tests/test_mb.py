@@ -98,19 +98,19 @@ def test_mb02ed_parameter_errors():
     # Test for wrong parameter typet
     with pytest.raises(expected_exception=SlycotParameterError, match='typet must be either "R" or "C"') as cm:
         mb02ed(T=T, B=B, n=n, k=k, typet='U', nrhs=nrhs)
-        assert cm.value.info == -1
+    assert cm.value.info == -1
     #Test for negative number of columns
     with pytest.raises(expected_exception=SlycotParameterError, match="k must be >= 0") as cm:
         mb02ed(T=T, B=B, n=n, k=-1, typet=TYPET, nrhs=nrhs)
-        assert cm.value.info == -2
+    assert cm.value.info == -2
     #Test for negative number of blocks
     with pytest.raises(expected_exception=SlycotParameterError, match="n must be >= 0") as cm:
         mb02ed(T=T, B=B, n=-1, k=k, typet=TYPET, nrhs=nrhs)
-        assert cm.value.info == -3
+    assert cm.value.info == -3
     #Test for negative number of right hand sides
     with pytest.raises(expected_exception=SlycotParameterError, match="nrhs must be >= 0") as cm:
         mb02ed(T=T, B=B, n=n, k=k, typet=TYPET, nrhs=-1)
-        assert cm.value.info == -4
+    assert cm.value.info == -4
 
 
 def test_mb02ed_matrix_error():
@@ -153,7 +153,7 @@ def test_mb02ed_matrix_error():
                        "The Toeplitz matrix associated\nwith T "
                        r"is not numerically positive definite.") as cm:
         mb02ed(T=T, B=B, n=n, k=k, typet=TYPET, nrhs=nrhs)
-        assert cm.value.info == 1
+    assert cm.value.info == 1
 
 
 def test_mb03rd():
