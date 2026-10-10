@@ -62,7 +62,7 @@ The test command is the same as when building from the sdist::
 Non-isolated, editable build
 ----------------------------
 
-When doing development one builds over and over; in that case it's faster to do a non-isolated editable build.  Run or adapt developer script `inplace-editable-build.bash`_ for that.  CMake variables can be set to configure the build; for example, in the command below, ``BLA_VENDOR`` is set to to tell CMake to use the Netlib BLAS/LAPACK libraries.  This example is not merely illustrative: on Debian 13 *not* specifying ``BLA_VENDOR`` can cause test failures.
+When doing development one builds over and over; in that case it's faster to do a non-isolated editable build.  Run or adapt developer script `inplace-editable-build.bash`_ for that.  CMake variables can be set to configure the build; for example, in the command below, ``BLA_VENDOR`` is set to tell CMake to use the Netlib BLAS/LAPACK libraries.  This example is not merely illustrative: on Debian 13 *not* specifying ``BLA_VENDOR`` can cause test failures.
 
 .. _`inplace-editable-build.bash`: BLA_VENDOR=Generic ./dev-tools/inplace-editable-build.bash
 
