@@ -3,7 +3,7 @@
 
 import pytest
 from numpy import array, eye, zeros
-from numpy.testing import assert_allclose, assert_raises
+from numpy.testing import assert_allclose, assert_array_almost_equal_nulp, assert_raises
 
 from slycot import synthesis
 from slycot.exceptions import (SlycotArithmeticError, SlycotParameterError,
@@ -214,3 +214,11 @@ def test_sb10fd_2():
      (synthesis.sb10fd, SlycotParameterError,  (-27, ),        {})))
 def test_sb_docparse(fun, exception_class, erange, checkvars):
     assert_docstring_parse(fun.__doc__,  exception_class, erange, checkvars)
+
+
+def test_sb04qd():
+    from .sb04qd_data import sb04qd_data
+    n, m, A, B, C, Xref = sb04qd_data()
+
+    Xtest = synthesis.sb04qd(n, m, A, B, C)
+    assert_array_almost_equal_nulp(Xref, Xtest, nulp=1)
