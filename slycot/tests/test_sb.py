@@ -221,4 +221,5 @@ def test_sb04qd():
     n, m, A, B, C, Xref = sb04qd_data()
 
     Xtest = synthesis.sb04qd(n, m, A, B, C)
-    assert_array_almost_equal_nulp(Xref, Xtest, nulp=1)
+    # ulp diff of 6 observed following update to SLICOT
+    assert_array_almost_equal_nulp(Xref, Xtest, nulp=7)
