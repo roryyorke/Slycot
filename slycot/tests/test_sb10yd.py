@@ -3,6 +3,7 @@ from scipy import signal
 
 from slycot import synthesis
 
+import pytest
 
 # ruff: disable[UP039]
 class Test_sb10yd():
@@ -110,6 +111,7 @@ class Test_sb10yd():
         # Because flag = 0, we expect n == n_id
         np.testing.assert_equal(n, n_id)
 
+    @pytest.mark.filterwarnings("ignore:Badly conditioned")
     def test_sb10yd_disc_exec(self):
         """A simple execution test. Case n=2.
         """
@@ -141,6 +143,7 @@ class Test_sb10yd():
         # Because flag = 0, we expect n == n_id
         np.testing.assert_equal(n, n_id)
 
+    @pytest.mark.filterwarnings("ignore:Badly conditioned")
     def test_sb10yd_disc_allclose(self):
         """Compare given and identified frequency response. Case n=2.
         """
