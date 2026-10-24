@@ -1,4 +1,4 @@
-name: upstream example
+name: Upstream example
 
 on:
   push:
@@ -10,14 +10,10 @@ jobs:
     name: Ex2 Windows
     runs-on: "windows-latest"
     steps:
-      - name: Checkout Slycot
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-          submodules: 'recursive'
       - name: Setup Conda
         uses: conda-incubator/setup-miniconda@v4
         with:
+          auto-update-conda: true
           miniconda-version: "latest"
           activate-environment: build-env
           conda-build-version: 26.3.0
@@ -25,5 +21,4 @@ jobs:
       - name: Bash
         shell: bash -el {0}
         run: |
-          conda info
-          conda list
+          conda build --help
