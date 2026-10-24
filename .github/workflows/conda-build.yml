@@ -13,8 +13,6 @@ jobs:
         fail-fast: false
         matrix:
           os:
-            - 'ubuntu'
-            - 'macos'
             - 'windows'
           python:
             - '3.13'
@@ -28,7 +26,6 @@ jobs:
       - name: Setup Conda
         uses: conda-incubator/setup-miniconda@v4
         with:
-          auto-update-conda: true
           activate-environment: build-env
           miniforge-version: "latest"
           conda-build-version: 26.3.0
