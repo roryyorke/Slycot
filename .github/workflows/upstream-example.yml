@@ -15,6 +15,7 @@ jobs:
           miniconda-version: "latest"
           activate-environment: build-env
           conda-build-version: 26.3.0
+          channel-priority: strict
       - name: Bash
         shell: bash -el {0}
         run: |
