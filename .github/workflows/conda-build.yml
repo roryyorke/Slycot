@@ -30,7 +30,7 @@ jobs:
         with:
           auto-update-conda: true
           activate-environment: build-env
-          miniforge-version: latest
+          miniforge-version: "latest"
           conda-build-version: 26.3.0
           channel-priority: strict
       - name: Conda build
