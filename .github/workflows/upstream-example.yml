@@ -1,23 +1,16 @@
-name: Upstream example
+name: Conda build fail MWE
 
 on:
   push:
   pull_request:
-  workflow_dispatch:
 
 jobs:
-  example-2-win:
-    name: Ex2 Windows
+  conda-build-mwe:
+    name: Run conda build --help
     runs-on: "windows-latest"
     steps:
       - name: Setup Conda
         uses: conda-incubator/setup-miniconda@v4
-        with:
-          auto-update-conda: true
-          miniconda-version: "latest"
-          activate-environment: build-env
-          conda-build-version: 26.3.0
-          channel-priority: strict
       - name: Bash
         shell: bash -el {0}
         run: |
