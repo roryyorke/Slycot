@@ -11,6 +11,8 @@ jobs:
     steps:
       - name: Setup Conda
         uses: conda-incubator/setup-miniconda@v4
+        with:
+          conda-build-version: 26.9.1
       - name: Bash
         shell: bash -el {0}
         run: |
