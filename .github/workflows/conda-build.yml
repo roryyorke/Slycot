@@ -26,6 +26,7 @@ jobs:
       - name: Setup Conda
         uses: conda-incubator/setup-miniconda@v4
         with:
+          auto-update-conda: true
           activate-environment: build-env
           miniconda-version: "latest"
           conda-build-version: 26.9.1
