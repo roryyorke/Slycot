@@ -2,6 +2,7 @@
 # sb* synthesis tests
 
 import pytest
+import numpy as np
 from numpy import array, eye, zeros
 from numpy.testing import assert_allclose, assert_array_almost_equal_nulp, assert_raises
 
@@ -221,5 +222,6 @@ def test_sb04qd():
     n, m, A, B, C, Xref = sb04qd_data()
 
     Xtest = synthesis.sb04qd(n, m, A, B, C)
-    # ulp diff of 6 observed following update to SLICOT
-    assert_array_almost_equal_nulp(Xref, Xtest, nulp=7)
+    # ulp diff of 12 observed following update to SLICOT
+    assert_array_almost_equal_nulp(Xref, Xtest, nulp=13)
+    assert np.max(np.abs(A @ Xtest @ B + Xtest - C)) < 1e-13
