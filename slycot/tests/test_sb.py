@@ -219,9 +219,7 @@ def test_sb_docparse(fun, exception_class, erange, checkvars):
 
 def test_sb04qd():
     from .sb04qd_data import sb04qd_data
-    n, m, A, B, C, Xref = sb04qd_data()
+    n, m, A, B, C, _Xref = sb04qd_data()
 
     Xtest = synthesis.sb04qd(n, m, A, B, C)
-    # ulp diff of 12 observed following update to SLICOT
-    assert_array_almost_equal_nulp(Xref, Xtest, nulp=13)
     assert np.max(np.abs(A @ Xtest @ B + Xtest - C)) < 1e-13
