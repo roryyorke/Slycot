@@ -4,7 +4,7 @@
 import pytest
 import numpy as np
 from numpy import array, eye, zeros
-from numpy.testing import assert_allclose, assert_array_almost_equal_nulp, assert_raises
+from numpy.testing import assert_allclose, assert_raises
 
 from slycot import synthesis
 from slycot.exceptions import (SlycotArithmeticError, SlycotParameterError,
