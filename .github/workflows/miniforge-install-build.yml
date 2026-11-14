@@ -19,21 +19,16 @@ jobs:
       - name: setup miniforge
         shell: cmd
         run: |
-          dir %UserProfile%\Miniforge3
-          dir %UserProfile%\Miniforge3\condabin
-          dir %UserProfile%\Miniforge3\Scripts
-          %UserProfile%\Miniforge3\condabin\conda.bat init
-          conda --help
-      #     %UserProfile%\Miniforge3\_conda.exe init
-      # - name: run conda help
-      #   shell: cmd
-      #   run: |
-      #     conda.exe --help
-      # - name: install conda build
-      #   shell: cmd
-      #   run: |
-      #     conda.exe install -n base conda-build
-      # - name: run conda build --help
-      #   shell: cmd
-      #   run: |
-      #     conda.exe build --help
+          %UserProfile%\Miniforge3\Scripts\conda.exe init
+      - name: run conda help
+        shell: cmd
+        run: |
+          conda.exe --help
+      - name: install conda build
+        shell: cmd
+        run: |
+          conda.exe install -n base conda-build
+      - name: run conda build --help
+        shell: cmd
+        run: |
+          conda.exe build --help
