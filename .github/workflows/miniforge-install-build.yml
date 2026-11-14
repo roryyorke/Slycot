@@ -1,0 +1,29 @@
+name: Install miniforge + conda-build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  install-miniforge:
+    name: Install miniforge latest
+    runs-on: "windows-latest"
+    steps:
+      - name: Download miniforge
+        run: |
+          curl https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Windows-x86_64.exe -o Miniforge3-Windows-x86_64.exe
+      - name: Install miniforge
+        run: |
+          start /wait "" Miniforge3-Windows-x86_64.exe /InstallationType=JustMe /RegisterPython=0 /S /D=%UserProfile%\Miniforge3
+      - name: setup miniforge
+        run: |
+          %UserProfile%\Miniforge3\bin\conda.exe init
+      - name: run conda help
+        run: |
+          conda.exe --help
+      - name: install conda build
+        run: |
+          conda.exe install -n base conda-build
+      - name: run conda build --help
+        run: |
+          conda.exe build --help
