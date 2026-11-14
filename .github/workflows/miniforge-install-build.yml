@@ -21,7 +21,9 @@ jobs:
         run: |
           dir %UserProfile%\Miniforge3
           dir %UserProfile%\Miniforge3\condabin
-          conda init
+          dir %UserProfile%\Miniforge3\Scripts
+          %UserProfile%\Miniforge3\condabin\conda.bat init
+          conda --help
       #     %UserProfile%\Miniforge3\_conda.exe init
       # - name: run conda help
       #   shell: cmd
