@@ -15,7 +15,7 @@ jobs:
           auto-update-conda: true
           miniconda-version: "latest"
           activate-environment: build-env
-          conda-build-version: "latest"
+          conda-build-version: "26.9.1"
       - name: Bash
         shell: bash -el {0}
         run: |
