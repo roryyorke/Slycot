@@ -14,7 +14,7 @@ jobs:
           curl.exe --location --output Miniforge3-Windows-x86_64.exe https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Windows-x86_64.exe
       - name: Install miniforge
         run: |
-          start /wait "" Miniforge3-Windows-x86_64.exe /InstallationType=JustMe /RegisterPython=0 /S /D=$env:UserProfile\Miniforge3
+          start "miniforge install" /wait "Miniforge3-Windows-x86_64.exe" /InstallationType=JustMe /RegisterPython=0 /S /D=$env:UserProfile\Miniforge3
       - name: setup miniforge
         run: |
           $env:UserProfile\Miniforge3\bin\conda.exe init
