@@ -17,18 +17,18 @@ jobs:
         run: |
           start "miniforge install" /wait "Miniforge3-Windows-x86_64.exe" /InstallationType=JustMe /RegisterPython=0 /S /D=%UserProfile%\Miniforge3
       - name: setup miniforge
+        shell: cmd
         run: |
-          shell: cmd
           %UserProfile%\Miniforge3\bin\conda.exe init
       - name: run conda help
+        shell: cmd
         run: |
-          shell: cmd
           conda.exe --help
       - name: install conda build
+        shell: cmd
         run: |
-          shell: cmd
           conda.exe install -n base conda-build
       - name: run conda build --help
+        shell: cmd
         run: |
-          shell: cmd
           conda.exe build --help
